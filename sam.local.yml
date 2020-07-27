@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'holdings-service'
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 30
+
+Resources:
+  HoldingService:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      Handler: app.handle_event
+      Runtime: ruby2.7
+      Events:
+        CreateHoldingsPath:
+          Type: Api
+          Properties:
+            Path: "/api/v0.1/holdings"
+            Method: POST
+      Environment:
+        Variables:
+          PLATFORM_API_BASE_URL: https://platform.nypl.org/api/v0.1/
+          NYPL_OAUTH_URL: https://isso.nypl.org/
+          LOG_LEVEL: debug
+          NYPL_OAUTH_ID: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGswaQYJKoZIhvcNAQcGoFwwWgIBADBVBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDGwps2kAQ2rowHoTfAIBEIAo4NrJQ8TDmuTM8fD+Ke9RAaiLxFkE4Z1SvGE5gkSsIJ0966etTQ2+qw==
+          NYPL_OAUTH_SECRET: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAIcwgYQGCSqGSIb3DQEHBqB3MHUCAQAwcAYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAzqpSpOyAs6z7xuhIYCARCAQxQmBeJEIuw09MFA+nmoqMfE7ZvqsfLUCsOlDApqRhiEM3M3pfWOaoK7kTKR+37sgrYqSkZTZuMWGzzFTXa2z0QKB7c=
