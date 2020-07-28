@@ -7,7 +7,7 @@ def init_db
       t.string :bib_id_links, array: true, default: []
       t.integer :item_ids, array: true, default: []
       t.string :item_id_links, array: true, default: []
-      t.booleandaterit_location
+      t.boolean :inherit_location
       t.string :allocation_rule
       t.integer :accounting_unit
       t.string :label_code
