@@ -11,7 +11,7 @@ def init
     username: ENV['DB_USERNAME'],
     password: ENV['DB_PASSWORD']
   )
-  init_db
+  init_db if ENV['INIT_DB']
 end
 
 def handle_event(event:, context:)
