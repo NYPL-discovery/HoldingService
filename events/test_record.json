@@ -1,0 +1,14 @@
+{
+  "Records": [
+    {
+      "bib_id": [1,2,3],
+      "label_code": "blah",
+      "accounting_unit": 1,
+      "created_date": "2020-07-29",
+      "holdings": {
+        "a": 1,
+        "b": [2,3]
+      }
+    }
+  ]
+}

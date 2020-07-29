@@ -1,5 +1,6 @@
 require 'parallel'
 require 'pg'
+require_relative 'models/record'
 
 require_relative 'holding-schema'
 
@@ -11,14 +12,17 @@ def init
     username: ENV['DB_USERNAME'],
     password: ENV['DB_PASSWORD']
   )
-  init_db if ENV['INIT_DB']
 end
 
 def handle_event(event:, context:)
+  p 'handling event: ', event, ENV.sort
   init
-  p 'handling event: ', event
 
   records_to_process = []
+
+  event["Records"].each do |record|
+    Record.create record
+  end
 
   # Parse records into array for parallel processing
   # event["Records"]

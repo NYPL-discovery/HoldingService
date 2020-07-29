@@ -24,5 +24,7 @@ Resources:
           PLATFORM_API_BASE_URL: https://platform.nypl.org/api/v0.1/
           NYPL_OAUTH_URL: https://isso.nypl.org/
           LOG_LEVEL: debug
-          NYPL_OAUTH_ID: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGswaQYJKoZIhvcNAQcGoFwwWgIBADBVBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDGwps2kAQ2rowHoTfAIBEIAo4NrJQ8TDmuTM8fD+Ke9RAaiLxFkE4Z1SvGE5gkSsIJ0966etTQ2+qw==
-          NYPL_OAUTH_SECRET: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAIcwgYQGCSqGSIb3DQEHBqB3MHUCAQAwcAYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAzqpSpOyAs6z7xuhIYCARCAQxQmBeJEIuw09MFA+nmoqMfE7ZvqsfLUCsOlDApqRhiEM3M3pfWOaoK7kTKR+37sgrYqSkZTZuMWGzzFTXa2z0QKB7c=
+          DATABASE: holdings
+          DB_HOST: docker.for.mac.localhost
+          DB_USERNAME: postgres
+          DB_PASSWORD: Dante86!perp
