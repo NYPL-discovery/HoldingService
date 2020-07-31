@@ -1,5 +1,6 @@
 require 'parallel'
 require 'pg'
+require 'nypl_ruby_util'
 require_relative 'models/record'
 
 require_relative 'holding-schema'
@@ -15,13 +16,20 @@ def init
 end
 
 def handle_event(event:, context:)
+  logger = NYPLRubyUtil::NyplLogFormatter.new(STDOUT, level: ENV['LOG_LEVEL'])
+  logger.info('handling event ', event)
   p 'handling event: ', event, ENV.sort
   init
 
   records_to_process = []
+  kinesis_client = NYPLRubyUtil::KinesisClient.new(
+    schema_string: ENV['SCHEMA_STRING'],
+    stream_name: ENV['STREAM_NAME']
+  )
 
-  event["Records"].each do |record|
+  event["body"].each do |record|
     Record.create record
+    kinesis_client << record
   end
 
   # Parse records into array for parallel processing
