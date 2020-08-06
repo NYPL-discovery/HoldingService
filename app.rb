@@ -16,8 +16,8 @@ def init
 end
 
 def handle_event(event:, context:)
-  logger = NYPLRubyUtil::NyplLogFormatter.new(STDOUT, level: ENV['LOG_LEVEL'])
-  logger.info('handling event ', event)
+  $logger = NYPLRubyUtil::NyplLogFormatter.new(STDOUT, level: ENV['LOG_LEVEL'])
+  $logger.info('handling event ', event)
   p 'handling event: ', event, ENV.sort
   init
 
@@ -27,10 +27,12 @@ def handle_event(event:, context:)
     stream_name: ENV['STREAM_NAME']
   )
 
-  event["body"].each do |record|
+  JSON.parse(event["body"]).each do |record|
     Record.create record
     kinesis_client << record
   end
+
+  respond 200
 
   # Parse records into array for parallel processing
   # event["Records"]
@@ -62,4 +64,16 @@ end
 
 def store_record(decoded_record)
   decoded_record
+end
+
+def respond(statusCode = 200, body = nil)
+  $logger.debug("Responding with #{statusCode}", body)
+
+  {
+    statusCode: statusCode,
+    body: body.to_json,
+    headers: {
+      "Content-type": "application/json"
+    }
+  }
 end
