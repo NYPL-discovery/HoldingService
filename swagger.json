@@ -1,0 +1,181 @@
+{
+  "swagger": "2.0",
+  "basePath": "/api",
+  "schemes": [
+    "https"
+  ],
+  "info": {
+    "title": "Holding Service",
+    "versions": "1.0.0"
+  },
+  "paths": {
+    "/v0.1/holdings": {
+      "post": {
+        "tags": [
+          "holdings"
+        ],
+        "summary": "Post (create or update) holdings records",
+        "operationId": "postHolding",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "newHolding",
+            "in": "body",
+            "required": "true",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Record"
+            }
+          }
+        ],
+        "responses" : {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/Success"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions" : {
+    "Record": {
+      "title": "Record",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "bibIds" : {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "bibIdLinks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "itemIds": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "itemIdLinks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "inheritLocation": {
+          "type": "boolean"
+        },
+        "allocationRule": {
+          "type": "string"
+        },
+        "accountingUnit": {
+          "type": "integer"
+        },
+        "labelCode": {
+          "type": "string"
+        },
+        "serialCode1": {
+          "type": "string"
+        },
+        "serialCode2": {
+          "type": "string"
+        },
+        "serialCode3": {
+          "type": "string"
+        },
+        "serialCode4": {
+          "type": "string"
+        },
+        "claimOnDate": {
+          "type": "string"
+        },
+        "receivingLocationCode": {
+          "type": "string"
+        },
+        "vendorCode": {
+          "type": "string"
+        },
+        "updateCount": {
+          "type": "string"
+        },
+        "pieceCount": {
+          "type": "integer"
+        },
+        "eCheckInCode": {
+          "type": "string"
+        },
+        "mediaTypeCode": {
+          "type": "string"
+        },
+        "updatedDate": {
+          "type": "string"
+        },
+        "createdDate": {
+          "type": "string"
+        },
+        "deletedDate": {
+          "type": "string"
+        },
+        "deleted": {
+          "type": "boolean"
+        },
+        "suppressed": {
+          "type": "boolean"
+        },
+        "fixedFields": {
+          "type": "object"
+        },
+        "varFields": {
+          "type": "object"
+        },
+        "holdings": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Error": {
+      "properties": {
+        "statusCode": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string",
+          "example": "Description of error"
+        }
+      },
+      "type": "object",
+      "title": "Error"
+    },
+    "Success": {
+      "properties": {
+        "statusCode": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "type": "object",
+      "title": "Success"
+    }
+  }
+}
