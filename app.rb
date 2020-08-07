@@ -13,57 +13,30 @@ def init
     username: ENV['DB_USERNAME'],
     password: ENV['DB_PASSWORD']
   )
+  $logger = NYPLRubyUtil::NyplLogFormatter.new(STDOUT, level: ENV['LOG_LEVEL'])
+  $db_fields = Hash.new { |h,k| h[k] = k.gsub(/([a-z])([^a-z])/){"#{$1}_#{$2.downcase}"}  }
 end
 
 def handle_event(event:, context:)
-  $logger = NYPLRubyUtil::NyplLogFormatter.new(STDOUT, level: ENV['LOG_LEVEL'])
-  $logger.info('handling event ', event)
-  p 'handling event: ', event, ENV.sort
   init
 
-  records_to_process = []
+  $logger.info('handling event ', event)
+
   kinesis_client = NYPLRubyUtil::KinesisClient.new(
     schema_string: ENV['SCHEMA_STRING'],
     stream_name: ENV['STREAM_NAME']
   )
 
   JSON.parse(event["body"]).each do |record|
-    Record.create record
+    Record.create db_record(record)
     kinesis_client << record
   end
 
   respond 200
-
-  # Parse records into array for parallel processing
-  # event["Records"]
-  #   .select { |record| record["eventSource"] == "aws:kinesis" }
-  #   .each do |record|
-  #     records_to_process << record
-  #   end
-
-  # Process records in parallel
-  # record_results = Parallel.map(records_to_process, in_processes: 3) { |record| process_record(record) }
 end
 
-def process_record record
-  decoded_record = parse_record(record)
-  unless decoded_record && should_process?(decoded_record)
-    return decoded_record ? [decoded_record['id'], 'SKIPPING'] : [nil, 'ERROR']
-  end
-
-  return store_record(decoded_record)
-end
-
-def parse_record(record)
-  record
-end
-
-def should_process?(data)
-  true
-end
-
-def store_record(decoded_record)
-  decoded_record
+def db_record(record)
+  record.map {|k,v| [$db_fields[k], v]}.to_h
 end
 
 def respond(statusCode = 200, body = nil)
