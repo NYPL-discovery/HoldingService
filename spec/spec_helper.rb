@@ -1,5 +1,10 @@
 require_relative 'db_init'
 
+ENV['DATABASE']='test_holdings'
+ENV['DB_HOST']='localhost'
+ENV['DB_USERNAME']='postgres'
+ENV['LOG_LEVEL']='info'
+
 ActiveRecord::Base.establish_connection(
   adapter: 'postgresql',
   database: ENV['DATABASE'],

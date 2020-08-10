@@ -1,0 +1,40 @@
+language: ruby
+rvm: 2.7.0
+services:
+- postgresql
+before_script:
+- psql -c 'create database test_holdings;' -U postgres
+before_install:
+- gem install bundler
+cache: bundler
+script:
+- bundle exec rspec -fd
+deploy:
+- provider: lambda
+  function_name: HoldingService-qa
+  description: A service for recording parsed holdings records processed by the holdings
+    pipeline
+  region: us-east-1
+  role: arn:aws:iam::946183545209:role/lambda-full-access
+  runtime: ruby2.7
+  module_name: app
+  handler_name: handle_event
+  environment_variables:
+  - DATABASE=holdings
+  - DB_HOST=holdings-qa.cluster-cvy7z512hcjg.us-east-1.rds.amazonaws.com
+  - DB_PASSWORD=AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGswaQYJKoZIhvcNAQcGoFwwWgIBADBVBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDASbb0AtfKkNoV46qAIBEIAo2vo+OWx1XryBOr05usabWsLjcHkCpcWWTYiUpojcvZqBoz+KQFYhWQ==
+  - DB_USERNAME=postgres
+  - LOG_LEVEL=info
+  - PLATFORM_API_BASE_URL=https://qa-platform.nypl.org/api/v0.1/
+  - SCHEMA_STRING=Holding
+  - STREAM_NAME=Holding-qa
+  skip_cleanup: true
+  access_key_id: "$AWS_ACCESS_KEY_ID_QA"
+  secret_access_key: "$AWS_SECRET_ACCESS_KEY_QA"
+  on:
+    branch: qa
+env:
+  global:
+  - secure: eI/elrpw1WHZ6n9jFwbjvocEzxyX63EYR+aNFDYiKilathAzUMFvKleu3WmmwSuwQ1puCy4v8bGL7LxRx6AQnvkrVxzP1yEKlT1bgmKPWh2UM9oK+RgYSJyLzNpmzjysNCQp+dEqLUBRDbUS/oMQ0yd9985adW295HaYfa7hQHYtHTL39Pt+6JgZWmGLkE81Oxg+SBfHCjE2Go6uvhKeU1SV0X2Ucb645QhYI2tnN1/g2bLUabI5bIs10koLbnzNZTM9QrBHRy7L7+20JATVW4Uer6uZffzLBM6AalRqBAS705uSpRhxqkwCiHiPlgHZLNmFXDje8EmCjGJw4Lij5RHIKjqaBZSpKoPqkVmp4Uy6Nl3l/celFbSaoX3b83s56IZ6mLRWyJe+0OmD/Cxdda8qEzki1IM4fyJrPm3oYVdaChDGJoTiI0V/PteK9hZftqdcSuHEjPsXFwt/Bs1DA4mTVaBY1JlICqQYsbh6EMI5h1ZjX143KnWKy4T9zl9oGDY5VxlaiPQ2vtIP6Ly41G7sPNRUKJwF+RhZpW/vbIn5WW75KJtTnOCfY4kLW2OSsp1jiy3tzY5uHrMvjkgXYrGoENUXVbPMiNosDsh6XJyfGeNhoZw6RTM8LAlunrMk+vMedpxzBWjh5rpQmjvXDULzb2GM3kBZIxQqEYbC3Ho=
+  - secure: HLcXrOFduFZvByzRWeuO0zrzu2tVdCrpFFzVVNRqu27RUYMChupCmM2i9O9tnSx8BJ1AN6G/Mw9pYpBsCrosMS/RT/bqQVjCxeOY5MfIpbMrK92P0qsdvLCp1itb5jbuz9xQMMsRiaq6xhMafjM7IuncLa+4IqorDWiaaEqKuZlC8XBRyuto8zRc5C1D+Pz/2ril5hFprzdn1Lll+Hfxu2kPr+q8ad6UdggNSjVWyUF1fs+SlSgQRV/erRD99sMa8C9o4bC8WwfxlSEx+Jb3SwEtL4hUuXCssRAtK6EpBycJQW6zkEZdQf3b3dYDK+4aLxKIATEqYcS+AFwzvqv2Y09f3r+PFn3+OA890vR9aa1UsFrj/F2O2sYsy9x2INm2khQ+g46M18UT+CdMm/V8BJ7Cz/z49v/BYD8oG4qPEfPArVQL3RS4RCBaoPMQFOdFIf9/nFOjz2Zj/3BOKV6ez/vkGvnqk5mOxBcR1P2eQTds2+fsmBNYWpkIwHYyaGaNSXZ9XNEEWoViAm8KRK7I2SCieUI5tzbm4kO10yipeIIZNc56WfHSRcQgvqjxiWcrLSlFba7PWLZfTdQoHEsM5EHGB4q4c84ka9QhsmGNtnexCOj2IbBgICenTLCfZful91tRepgtF7YABglRcXbvEyi3m28yGUz5CzfVcKc8gIQ=
+  - secure: EN3PdTUFPzZjvYPV7JBjM/jpJ6JO+SFcCKLZgsCbpT6+izeCY4zSlQcKwrFNNS8BIuufcvY4Rbozlu/M2U1aks0RCVBk7uKYvEhGuZaAnKHAlnlls79I5SzHpL5AlpbwspVhekUnTL8qRI9l/wPoFtR7xOZBtFqs7jGLlwbo0AG69saMFdOAvDEJM7rw/wibPxnhBeGC2AYbHXHdvMXFPvyRD9AOkNazZgZ0cd4okYQx09N3c63K5Ph0S+HCD+DEDOMh88C/gevASOAsEBg6nRD2Lzbze2GNosO+NCAizIoqhI5bEotF4ZQ2O/5B1pVgbEoFaoD8eQrlHMKmh0Z7bsSnH+IEFwUi46uMiS9DYRVhD54+Felr0FVX9fu+xYp9x/1z4ZbsScXLiMsGz9NgGpQHA9EKpApPBUPjttJXhZ6ntI5Gr2rMMbLa/NYOOS326IC5qqHHA5Yfsrv386owNxQiPldCjXdIoFhIjsSY6AlUUP+KnK/fhLLotCN9JONY+5J4Ziyi4eT2wothtuUeZM0KivGVd4tWZgRUtCwt1rxjpcaAAfSRpfhucyLh6lAoXOBYkrrg6VSSdS2hw41SvS2MaPgL6maZSGaa8cJr4kR0WyhbRd4DOopmKzMVJcTAFbrjSoloDejhn9fvtpwPLNSiGqVOGKxV3FXOIuKrejM=
