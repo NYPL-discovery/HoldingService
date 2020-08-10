@@ -29,15 +29,14 @@ def handle_event(event:, context:)
   path = event["path"]
   method = event["httpMethod"].downcase
 
-  if method == 'get' && path == "/docs/patron"
+  $logger.info('handling event ', event)
+
+  if method == 'get' && path == "/docs/holding"
     return respond 200, $swagger_doc
   end
 
-
-  $logger.info('handling event ', event)
-
   begin
-    records = event["body"].map({|record_string| JSON.parse(record_string)})
+    records = JSON.parse(event["body"]).map {|record| db_record(record)}
   rescue => e
     $logger.error('problem parsing JSON for event', e.message)
     return respond 500, { message: e.message }
