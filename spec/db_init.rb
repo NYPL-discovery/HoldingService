@@ -3,7 +3,7 @@ require 'active_record'
 
 def init_db
   ActiveRecord::Schema.define do
-    drop_table :records
+    drop_table :records, if_exists: true
   end
 
   ActiveRecord::Schema.define do
