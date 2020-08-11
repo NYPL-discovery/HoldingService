@@ -38,7 +38,6 @@ def handle_event(event:, context:)
   begin
     records = JSON.parse(event["body"]).map {|record| db_record(record)}
   rescue => e
-    p 'json error ', e
     $logger.error('problem parsing JSON for event', e.message)
     return respond 500, { message: e.message }
   end
@@ -46,7 +45,6 @@ def handle_event(event:, context:)
   begin
     Record.upsert_all(records, unique_by: :id)
   rescue => e
-    p 'upsert error ', e
     $logger.error('problem persisting records to database', e.message)
     return respond 500, { message: e.message }
   end
@@ -54,7 +52,6 @@ def handle_event(event:, context:)
   begin
     records.each {|record| $kinesis_client << record }
   rescue => e
-    p 'kinesis error ', e
     return respond 500, { message: e.message }
   end
 
