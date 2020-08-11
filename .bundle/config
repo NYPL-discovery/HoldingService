@@ -1,5 +1,5 @@
 ---
-BUNDLE_BUILD__PG: "--with-pg-config=/lib64"
+BUNDLE_BUILD__PG: "--with-pg-config=/lib"
 BUNDLE_SILENCE_ROOT_WARNING: "true"
 BUNDLE_PATH: "vendor/bundle"
 BUNDLE_CLEAN: "true"
