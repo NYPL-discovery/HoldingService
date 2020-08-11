@@ -6,6 +6,7 @@ require_relative 'models/record'
 require_relative 'holding-schema'
 
 def init
+  $logger = NYPLRubyUtil::NyplLogFormatter.new(STDOUT, level: ENV['LOG_LEVEL'])
   kms_client =  NYPLRubyUtil::KmsClient.new(ENV['KMS_OPTIONS'] ? JSON.parse(ENV['KMS_OPTIONS']) : {})
   password = kms_client.decrypt(ENV['DB_PASSWORD'])
   ActiveRecord::Base.establish_connection(
@@ -15,7 +16,6 @@ def init
     username: ENV['DB_USERNAME'],
     password: password
   )
-  $logger = NYPLRubyUtil::NyplLogFormatter.new(STDOUT, level: ENV['LOG_LEVEL'])
   $db_fields = Hash.new { |h,k| h[k] = k.gsub(/([a-z])([^a-z])/){"#{$1}_#{$2.downcase}"}  }
   $kinesis_client = NYPLRubyUtil::KinesisClient.new(
     schema_string: ENV['SCHEMA_STRING'],
