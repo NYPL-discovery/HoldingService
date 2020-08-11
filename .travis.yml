@@ -19,7 +19,7 @@ deploy:
   runtime: ruby2.7
   module_name: app
   handler_name: handle_event
-  environment_variables:
+  environment:
   - DATABASE=holdings
   - DB_HOST=holdings-qa.cluster-cvy7z512hcjg.us-east-1.rds.amazonaws.com
   - DB_PASSWORD=AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGswaQYJKoZIhvcNAQcGoFwwWgIBADBVBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDASbb0AtfKkNoV46qAIBEIAo2vo+OWx1XryBOr05usabWsLjcHkCpcWWTYiUpojcvZqBoz+KQFYhWQ==
