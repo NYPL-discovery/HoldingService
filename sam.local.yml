@@ -21,10 +21,11 @@ Resources:
             Method: POST
       Environment:
         Variables:
-          PLATFORM_API_BASE_URL: https://platform.nypl.org/api/v0.1/
-          NYPL_OAUTH_URL: https://isso.nypl.org/
+          PLATFORM_API_BASE_URL: https://qa-platform.nypl.org/api/v0.1/
           LOG_LEVEL: debug
           DATABASE: holdings
           DB_HOST: docker.for.mac.localhost
           DB_USERNAME: postgres
-          DB_PASSWORD: Dante86!perp
+          DB_PASSWORD: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGswaQYJKoZIhvcNAQcGoFwwWgIBADBVBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDASbb0AtfKkNoV46qAIBEIAo2vo+OWx1XryBOr05usabWsLjcHkCpcWWTYiUpojcvZqBoz+KQFYhWQ==
+          SCHEMA_STRING: Holding
+          STREAM_NAME: Holding-qa
