@@ -6,6 +6,7 @@ require_relative 'models/record'
 require_relative 'holding-schema'
 
 def init
+  p 'env: ', ENV.sort
   $logger = NYPLRubyUtil::NyplLogFormatter.new(STDOUT, level: ENV['LOG_LEVEL'])
   kms_client =  NYPLRubyUtil::KmsClient.new(ENV['KMS_OPTIONS'] ? JSON.parse(ENV['KMS_OPTIONS']) : {})
   password = kms_client.decrypt(ENV['DB_PASSWORD'])
@@ -35,10 +36,12 @@ def handle_event(event:, context:)
     return respond 200, $swagger_doc
   end
 
+
   begin
-    records = JSON.parse(event["body"]).map {|record| db_record(record)}
+    body = JSON.parse(event["body"])
+    records = body.map {|record| db_record(record)}
   rescue => e
-    $logger.error('problem parsing JSON for event', e.message)
+    $logger.error('problem parsing JSON for event', { message: e.message })
     return respond 500, { message: e.message }
   end
 
@@ -47,14 +50,14 @@ def handle_event(event:, context:)
   begin
     Record.upsert_all(records, unique_by: :id)
   rescue => e
-    $logger.error('problem persisting records to database', e.message)
+    $logger.error('problem persisting records to database', { message: e.message })
     return respond 500, { message: e.message }
   end
 
   $logger.info('successfully persisted records')
 
   begin
-    records.each {|record| $kinesis_client << record }
+    body.each {|record| $kinesis_client << record }
   rescue => e
     return respond 500, { message: e.message }
   end
