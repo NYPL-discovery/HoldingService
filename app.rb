@@ -6,8 +6,8 @@ require_relative 'models/record'
 require_relative 'holding-schema'
 
 def init
-  p 'env: ', ENV.sort
   $logger = NYPLRubyUtil::NyplLogFormatter.new(STDOUT, level: ENV['LOG_LEVEL'])
+  $logger.info 'env: ', ENV.sort
   kms_client =  NYPLRubyUtil::KmsClient.new(ENV['KMS_OPTIONS'] ? JSON.parse(ENV['KMS_OPTIONS']) : {})
   password = kms_client.decrypt(ENV['DB_PASSWORD'])
   ActiveRecord::Base.establish_connection(
