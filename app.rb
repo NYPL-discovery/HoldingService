@@ -42,12 +42,16 @@ def handle_event(event:, context:)
     return respond 500, { message: e.message }
   end
 
+  $logger.info('successfully parsed records')
+
   begin
     Record.upsert_all(records, unique_by: :id)
   rescue => e
     $logger.error('problem persisting records to database', e.message)
     return respond 500, { message: e.message }
   end
+
+  $logger.info('successfully persisted records')
 
   begin
     records.each {|record| $kinesis_client << record }
