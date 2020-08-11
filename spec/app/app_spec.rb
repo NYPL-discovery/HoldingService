@@ -1,7 +1,13 @@
 require 'spec_helper'
 require_relative '../../app.rb'
 
+$mock_aws_kinesis = MockAwsKinesisClient.new
+
 describe 'init' do
+  before do
+    allow(Aws::Kinesis::Client).to receive(:initialize).and_return($mock_aws_kinesis)
+  end
+
   it 'should initialize db connection' do
     allow_any_instance_of(NYPLRubyUtil::KmsClient).to receive(:decrypt).and_return('')
     expect(ActiveRecord::Base).to receive(:establish_connection)
@@ -31,6 +37,7 @@ describe "handle_event" do
   mockMessage = 'mockMessage'
 
   before do
+    allow(Aws::Kinesis::Client).to receive(:new).and_return($mock_aws_kinesis)
     allow_any_instance_of(NYPLRubyUtil::KmsClient).to receive(:decrypt).and_return('')
     allow_any_instance_of(StandardError).to receive(:message).and_return(mockMessage)
     allow(self).to receive(:init).and_return(nil)
@@ -127,15 +134,16 @@ describe "handle_event" do
   it "should log in case of error in kinesis" do
     mock_response = MockKinesisResponse.new
     allow(mock_response).to receive(:successful?).and_return(false)
-    allow_any_instance_of(Aws::Kinesis::Client).to receive(:put_record).and_return(mock_response)
+    allow($mock_aws_kinesis).to receive(:put_record).and_return(mock_response)
     expect($logger).to receive(:error)
+    expect($mock_aws_kinesis).to receive(:put_record)
     handle_event(event: correct_event, context: nil)
   end
 
   it "should respond 500 in case of error in kinesis" do
     mock_response = MockKinesisResponse.new
     allow(mock_response).to receive(:successful?).and_return(false)
-    allow_any_instance_of(Aws::Kinesis::Client).to receive(:put_record).and_return(mock_response)
+    allow($mock_aws_kinesis).to receive(:put_record).and_return(mock_response)
     resp = handle_event(event: correct_event, context: nil)
     expect(resp).to eq(respond(500, { message: mockMessage }))
   end
@@ -143,7 +151,7 @@ describe "handle_event" do
   it "should respond 200 in case run is successful" do
     mock_response = MockKinesisResponse.new
     allow(mock_response).to receive(:successful?).and_return(true)
-    allow_any_instance_of(Aws::Kinesis::Client).to receive(:put_record).and_return(mock_response)
+    allow($mock_aws_kinesis).to receive(:put_record).and_return(mock_response)
     resp = handle_event(event: correct_event, context: nil)
     expect(resp).to eq(respond(200))
   end
