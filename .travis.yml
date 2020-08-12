@@ -6,6 +6,7 @@ before_script:
 - psql -c 'create database test_holdings;' -U postgres
 before_install:
 - gem install bundler
+- pip install awscli
 cache: bundler
 script:
 - bundle exec rspec -fd
@@ -36,6 +37,21 @@ deploy:
   secret_access_key: "$AWS_SECRET_ACCESS_KEY_QA"
   on:
     branch: qa
+after_deploy:
+- aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID_QA
+- aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY_QA
+- aws lambda update-function-configuration --function-name HoldingService-qa --environment "Variables={
+DATABASE=holdings,
+DB_HOST=holdings-qa.cluster-cvy7z512hcjg.us-east-1.rds.amazonaws.com,
+DB_PASSWORD=AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGowaAYJKoZIhvcNAQcGoFswWQIBADBUBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDLJ9OlUVqybIC2WobgIBEIAnhtDb4JBeevsrZ0p6TTEtRGB20/TnUv3suWDKZRVIerDqwg8qysQa,
+DB_USERNAME=postgres,
+LOG_LEVEL=info,
+PLATFORM_API_BASE_URL=https://qa-platform.nypl.org/api/v0.1/,
+SCHEMA_STRING=Holding,
+STREAM_NAME=Holding-qa,
+ATTEMPT=1
+}" --region us-east-1
+
 env:
   global:
   - secure: Bkjyp1kkIhC/hBNLECKsu1m5Be0wQhXb+UllRt4uyADVe4n3zVBHazqMt+KLL1Zptpj7HFoLIdpLN5QA7y3yFZ6//0R2yGoC+H2pXfW3kawNvKtY1fdzxqsXjiuVDA85l183x4V/JRrpBRSQIFq4WOTwIvw3iaO8eBEXRe87sOO+RikWs3PfZBws0RnacAmD1HG0SgADXQFo5DgdO/uThkVJDTSk4iTR9grJXpwIhAbRK5YQ/lO4ousSiUXp1LN5IijoMSuhDrGGr+4TQ34wXAAATUtIY6ZaOTPhgxqZl/Vyydj+Q0P+qZ7e/A6o19UG+TVg45YmrJUKCqI9uyQn/bRR25kjPj4t9BbNkPmHE4F4S4A51EMssHUR8PnUymjpPi0mTTO2qllUEOgUC+Fk3NlUVsCDdWs85nKLnbK+IO3i1fci4GY+HbRxqF8gEx+0gtRxOY1/bZfKRbR01ULV+8amiBm7MIZsSRGM+OAMA1NycRM6HJCVNqFuuiijIrCfJX689WzOE03Nr86JowsyGFY/z5JdHbJfvczjT0egO3Kkjtme4bgC46eQz+Vj8PF89aLeSXVPvglwFgnhbbq6ghytPiA/o23KJ3hqgekgy1AykfrCVxpxWyDERs6YkPxVz8G+Ya1pVRuRzon4eTyBOI7djOIAubXg9ufCTa1J+kg=
