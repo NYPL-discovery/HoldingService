@@ -6,11 +6,14 @@ before_script:
 - psql -c 'create database test_holdings;' -U postgres
 before_install:
 - gem install bundler
+- gem install pg
+install:
+- bundle install --without travis_test
 cache: bundler
 script:
 - bundle exec rspec -fd
 before_deploy:
-- rm -rf vendor/bundle/ruby/2.7.0/gems/pg-1.2.3
+- gem uninstall pg
 deploy:
 - provider: lambda
   function_name: HoldingService-qa
