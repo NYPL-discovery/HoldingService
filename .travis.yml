@@ -9,6 +9,8 @@ before_install:
 cache: bundler
 script:
 - bundle exec rspec -fd
+before_deploy:
+- gem uninstall pg
 deploy:
 - provider: lambda
   function_name: HoldingService-qa
