@@ -10,7 +10,7 @@ cache: bundler
 script:
 - bundle exec rspec -fd
 before_deploy:
-- gem uninstall pg
+- rm -rf vendor/bundle/ruby/2.7.0/gems/pg-1.2.3
 deploy:
 - provider: lambda
   function_name: HoldingService-qa
