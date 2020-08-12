@@ -10,6 +10,7 @@ cache: bundler
 script:
 - bundle exec rspec -fd
 before_deploy:
+- rm -rf vendor
 - bundle install --without travis_test
 deploy:
 - provider: lambda
