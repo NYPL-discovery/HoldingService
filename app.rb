@@ -33,7 +33,7 @@ def handle_event(event:, context:)
 
   $logger.info('handling event ', event)
 
-  if method == 'get' && path == "/docs/holding"
+  if method == 'get' && path == "/docs/holdings"
     return respond 200, $swagger_doc
   end
 
