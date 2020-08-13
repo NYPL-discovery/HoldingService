@@ -55,3 +55,8 @@ export SET BUNDLE_IGNORE_CONFIG=true; bundle exec rspec
 Deployment is handled by travis for the following branches:
 
 - `qa`
+
+
+## Managing
+
+Credentials for the database are in the parameter store under `[env]/rds/holding_service/credentials`
