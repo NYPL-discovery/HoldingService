@@ -72,7 +72,7 @@ def db_record(record)
 end
 
 def respond(statusCode = 200, body = nil)
-  $logger.debug("Responding with #{statusCode}", body)
+  $logger.info("Responding with #{statusCode}", { message: body })
 
   {
     statusCode: statusCode,
