@@ -40,9 +40,11 @@ sam local invoke --region us-east-1 --template sam.local.yml --profile nypl-digi
 
 ## Contributing
 
+This repo follows a [PRS-Target-Master Git Workflow](https://github.com/NYPL/engineering-general/blob/a19c78b028148465139799f09732e7eb10115eef/standards/git-workflow.md#prs-target-master-merge-to-deployment-branches)
+
 ## Testing
 
-Make sure you have bundle installed outside the docker image. 
+Make sure you have bundle installed outside the docker image.
 
 ```
 export SET BUNDLE_IGNORE_CONFIG=true; bundle exec rspec
