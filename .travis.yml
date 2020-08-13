@@ -26,8 +26,8 @@ deploy:
   environment:
   - DATABASE=holdings
   - DB_HOST=holdings-qa.cluster-cvy7z512hcjg.us-east-1.rds.amazonaws.com
-  - DB_PASSWORD=AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGowaAYJKoZIhvcNAQcGoFswWQIBADBUBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDLJ9OlUVqybIC2WobgIBEIAnhtDb4JBeevsrZ0p6TTEtRGB20/TnUv3suWDKZRVIerDqwg8qysQa
-  - DB_USERNAME=postgres
+  - DB_PASSWORD=AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAHIwcAYJKoZIhvcNAQcGoGMwYQIBADBcBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDK3yY4Th18HMKDTShgIBEIAvPk1ebdH9CUW4ObYCntibF3ePRcjRrdkejxGe8qiSNiwoGhH1MnyfS/69CG9raG8=
+  - DB_USERNAME=holdings_user
   - LOG_LEVEL=info
   - PLATFORM_API_BASE_URL=https://qa-platform.nypl.org/api/v0.1/
   - SCHEMA_STRING=Holding
