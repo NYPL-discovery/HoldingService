@@ -6,7 +6,7 @@
   ],
   "info": {
     "title": "Holding Service",
-    "versions": "1.0.0"
+    "version": "1.0.0"
   },
   "paths": {
     "/v0.1/holdings": {
@@ -26,10 +26,12 @@
           {
             "name": "newHolding",
             "in": "body",
-            "required": "true",
-            "type": "array",
-            "items": {
+            "required": true,
+            "schema": {
+             "type": "array",
+              "items": {
               "$ref": "#/definitions/Record"
+              }
             }
           }
         ],
