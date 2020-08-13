@@ -27,5 +27,6 @@ Resources:
           DB_HOST: docker.for.mac.localhost
           DB_USERNAME: postgres
           DB_PASSWORD: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGswaQYJKoZIhvcNAQcGoFwwWgIBADBVBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDASbb0AtfKkNoV46qAIBEIAo2vo+OWx1XryBOr05usabWsLjcHkCpcWWTYiUpojcvZqBoz+KQFYhWQ==
+          KMS_OPTIONS: "{\"profile\":\"nypl-digital-dev\"}"
           SCHEMA_STRING: Holding
           STREAM_NAME: Holding-qa
