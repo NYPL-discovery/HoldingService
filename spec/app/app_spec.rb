@@ -46,7 +46,7 @@ describe "handle_event" do
   end
 
   swagger_event = {
-    "path" => "/docs/holding",
+    "path" => "/docs/holdings",
     "httpMethod" => "get"
   }
 
