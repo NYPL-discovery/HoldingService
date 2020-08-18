@@ -151,6 +151,9 @@
         },
         "holdings": {
           "type": "object"
+        },
+        "locations": {
+          "type": "object"
         }
       },
       "type": "object"
