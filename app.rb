@@ -79,7 +79,7 @@ def get_holding(event)
     $logger.info("getting by ids: #{ids}")
     begin
       parsed_ids = ids.split(",").map {|id| id.to_i}
-      Record.where("ARRAY[id]::int[] && ARRAY[?]::int[]", parsed_ids)
+      records = Record.where("ARRAY[id]::int[] && ARRAY[?]::int[]", parsed_ids)
       return respond(200, records.map {|record| record.to_json})
     rescue => e
       message = "problem getting records with ids: #{ids}, message: #{e.message}"
