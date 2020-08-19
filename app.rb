@@ -75,7 +75,7 @@ def get_holding(event)
   $logger.info('handling get request')
   params = event['queryStringParameters']
   $logger.info('params: ', params)
-  if ids = params['id']
+  if ids = params['ids']
     $logger.info("getting by ids: #{ids}")
     begin
       parsed_ids = ids.split(",").map {|id| id.to_i}
