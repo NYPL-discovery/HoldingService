@@ -91,7 +91,7 @@ def get_holding(event)
   $logger.info("getting by #{getting_by}: #{ids}, offset: #{offset}, limit: #{limit}")
   begin
     parsed_ids = ids.split(",").map {|id| id.to_i}
-    records = Record.where("#{} && ARRAY[?]::int[]", parsed_ids).offset(offset).limit(limit)
+    records = Record.where("#{identifier_for_where} && ARRAY[?]::int[]", parsed_ids).offset(offset).limit(limit)
     $logger.info("responding 200")
     return respond(200, records.map {|record| record.to_json})
   rescue => e
