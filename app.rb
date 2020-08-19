@@ -38,8 +38,9 @@ def handle_event(event:, context:)
   end
 
   if method == 'get'
-    return respond 200
+    return get_holding(event)
   end
+
 
   begin
     body = JSON.parse(event["body"])
@@ -68,6 +69,38 @@ def handle_event(event:, context:)
 
 
   respond 200
+end
+
+def get_holding(event)
+  $logger.info('handling get request')
+  params = event['queryStringParameters']
+  $logger.info('params: ', params)
+  if ids = params['id']
+    $logger.info("getting by ids: #{ids}")
+    begin
+      parsed_ids = ids.split(",").map {|id| id.to_i}
+      records = Record.find(parsed_ids)
+      return respond(200, records.map {|record| record.to_json})
+    rescue => e
+      $logger.error("problem getting records with ids: #{ids}", e.message)
+      return respond(500, "problem getting records with ids: #{ids}, message: #{e.message}")
+    end
+  elsif bib_ids = params['bib_ids']
+    offset = params['offset'] ? params['offset'].to_i : 0
+    limit = params['limit'] ? params['limit'].to_i : 20
+    $logger.info("getting by bib_ids: #{bib_ids}, offset: #{offset}, limit: #{limit}")
+    begin
+      parsed_bib_ids = bib_ids.split(",").map {|id| id.to_i}
+      records = Record.where("bib_ids && ARRAY[?]::int[]", parsed_bib_ids).offset(offset).limit(limit)
+      return respond(200, records.map {|record| record.to_json})
+    rescue => e
+      $logger.error("problem getting records with bib_ids: #{bib_ids}, offset: #{offset}, limit: #{limit}", e.message)
+      return respond(500, "problem getting records with bib_ids: #{bib_ids}, offset: #{offset}, limit: #{limit} message: #{e.message}")
+    end
+  else
+    $logger.info("Missing required fields ids or bib_ids")
+    return respond(400, "Missing required fields ids or bib_ids")
+  end
 end
 
 def db_record(record)
