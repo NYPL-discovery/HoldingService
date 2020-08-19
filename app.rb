@@ -37,6 +37,10 @@ def handle_event(event:, context:)
     return respond 200, $swagger_doc
   end
 
+  if method == 'get'
+    return get_holding(event)
+  end
+
 
   begin
     body = JSON.parse(event["body"])
@@ -65,6 +69,24 @@ def handle_event(event:, context:)
 
 
   respond 200
+end
+
+def get_holding(event)
+  $logger.info('handling get request')
+  if event['params']['ids']
+    $logger.info("getting by ids: #{event['params']['ids']}")
+    ids = event['params']['ids']
+    begin
+      records = Record.find(ids)
+    rescue => e
+      $logger.error("problem getting records with ids: #{ids}", e.message)
+      return respond(500, )
+  elsif event['params']['bib_ids']
+    $logger.info("getting by bib_ids: #{event['params']['bib_ids']}")
+  else
+    $logger.info("Missing required fields ids or bib_ids")
+    return respond(400, "Missing required fields ids or bib_ids")
+  end
 end
 
 def db_record(record)
