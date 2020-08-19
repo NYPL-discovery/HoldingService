@@ -75,16 +75,19 @@ def get_holding(event)
   $logger.info('handling get request')
   params = event['queryStringParameters']
   $logger.info('params: ', params)
-  if !params['ids'] && !param['bib_ids']
+  if ids = params['ids']
+    getting_by = 'ids'
+    identifier_for_where = 'ARRAY[id]::int[]'
+  elsif ids = params['bib_ids']
+    getting_by = 'bib_ids'
+    identifier_for_where = 'bib_ids'
+  else
     message = "Missing required fields ids or bib_ids"
     $logger.info(message)
     return respond(400, message)
   end
-  getting_by = params['ids'] ? 'ids' : 'bib_ids'
-  ids = params[getting_by]
   offset = params['offset'] ? params['offset'].to_i : 0
   limit = params['limit'] ? params['limit'].to_i : 20
-  identifier_for_where = getting_by == 'ids' ? 'ARRAY[id]::int[]' : 'bib_ids'
   $logger.info("getting by #{getting_by}: #{ids}, offset: #{offset}, limit: #{limit}")
   begin
     parsed_ids = ids.split(",").map {|id| id.to_i}
