@@ -75,33 +75,26 @@ def get_holding(event)
   $logger.info('handling get request')
   params = event['queryStringParameters']
   $logger.info('params: ', params)
-  if ids = params['ids']
-    $logger.info("getting by ids: #{ids}")
-    begin
-      parsed_ids = ids.split(",").map {|id| id.to_i}
-      records = Record.where("ARRAY[id]::int[] && ARRAY[?]::int[]", parsed_ids)
-      return respond(200, records.map {|record| record.to_json})
-    rescue => e
-      message = "problem getting records with ids: #{ids}, message: #{e.message}"
-      $logger.error(message)
-      return respond(500, message)
-    end
-  elsif bib_ids = params['bib_ids']
-    offset = params['offset'] ? params['offset'].to_i : 0
-    limit = params['limit'] ? params['limit'].to_i : 20
-    $logger.info("getting by bib_ids: #{bib_ids}, offset: #{offset}, limit: #{limit}")
-    begin
-      parsed_bib_ids = bib_ids.split(",").map {|id| id.to_i}
-      records = Record.where("bib_ids && ARRAY[?]::int[]", parsed_bib_ids).offset(offset).limit(limit)
-      return respond(200, records.map {|record| record.to_json})
-    rescue => e
-      message = "problem getting records with bib_ids: #{bib_ids}, offset: #{offset}, limit: #{limit} message: #{e.message}"
-      $logger.error(message)
-      return respond(500, message)
-    end
-  else
-    $logger.info("Missing required fields ids or bib_ids")
-    return respond(400, "Missing required fields ids or bib_ids")
+  if !params['ids'] && !param['bib_ids']
+    message = "Missing required fields ids or bib_ids"
+    $logger.info(message)
+    return respond(400, message)
+  end
+  getting_by = params['ids'] ? 'ids' : 'bib_ids'
+  ids = params[getting_by]
+  offset = params['offset'] ? params['offset'].to_i : 0
+  limit = params['limit'] ? params['limit'].to_i : 20
+  identifier_for_where = getting_by == 'ids' ? 'ARRAY[id]::int[]' : 'bib_ids'
+  $logger.info("getting by #{getting_by}: #{ids}, offset: #{offset}, limit: #{limit}")
+  begin
+    parsed_ids = ids.split(",").map {|id| id.to_i}
+    records = Record.where("#{} && ARRAY[?]::int[]", parsed_ids).offset(offset).limit(limit)
+    $logger.info("responding 200")
+    return respond(200, records.map {|record| record.to_json})
+  rescue => e
+    message = "problem getting records with #{getting_by}: #{ids}, message: #{e.message}"
+    $logger.error(message)
+    return respond(500, message)
   end
 end
 
