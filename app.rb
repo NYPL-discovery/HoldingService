@@ -82,8 +82,9 @@ def get_holding(event)
       records = Record.find(parsed_ids)
       return respond(200, records.map {|record| record.to_json})
     rescue => e
-      $logger.error("problem getting records with ids: #{ids}", e.message)
-      return respond(500, "problem getting records with ids: #{ids}, message: #{e.message}")
+      message = "problem getting records with ids: #{ids}, message: #{e.message}"
+      $logger.error(message)
+      return respond(500, message)
     end
   elsif bib_ids = params['bib_ids']
     offset = params['offset'] ? params['offset'].to_i : 0
@@ -94,8 +95,9 @@ def get_holding(event)
       records = Record.where("bib_ids && ARRAY[?]::int[]", parsed_bib_ids).offset(offset).limit(limit)
       return respond(200, records.map {|record| record.to_json})
     rescue => e
-      $logger.error("problem getting records with bib_ids: #{bib_ids}, offset: #{offset}, limit: #{limit}", e.message)
-      return respond(500, "problem getting records with bib_ids: #{bib_ids}, offset: #{offset}, limit: #{limit} message: #{e.message}")
+      message = "problem getting records with bib_ids: #{bib_ids}, offset: #{offset}, limit: #{limit} message: #{e.message}"
+      $logger.error(message)
+      return respond(500, message)
     end
   else
     $logger.info("Missing required fields ids or bib_ids")
