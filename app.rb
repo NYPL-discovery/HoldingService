@@ -37,6 +37,9 @@ def handle_event(event:, context:)
     return respond 200, $swagger_doc
   end
 
+  if method == 'get'
+    return respond 200
+  end
 
   begin
     body = JSON.parse(event["body"])
