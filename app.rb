@@ -75,10 +75,10 @@ def get_holding(event)
   $logger.info('handling get request')
   params = event['queryStringParameters']
   $logger.info("params: #{params}")
-  if ids = params['ids']
+  if params && ids = params['ids']
     getting_by = 'ids'
     identifier_for_where = 'ARRAY[id]::int[]'
-  elsif ids = params['bib_ids']
+  elsif params && ids = params['bib_ids']
     getting_by = 'bib_ids'
     identifier_for_where = 'bib_ids'
   else
