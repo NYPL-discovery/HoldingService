@@ -74,7 +74,7 @@ end
 def get_holding(event)
   $logger.info('handling get request')
   params = event['queryStringParameters']
-  $logger.info('params: ', params)
+  $logger.info("params: #{params}")
   if ids = params['ids']
     getting_by = 'ids'
     identifier_for_where = 'ARRAY[id]::int[]'
