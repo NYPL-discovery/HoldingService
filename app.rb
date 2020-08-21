@@ -2,6 +2,7 @@ require 'parallel'
 require 'pg'
 require 'nypl_ruby_util'
 require_relative 'models/record'
+require_relative 'src/http_methods'
 
 require_relative 'holding-schema'
 
@@ -34,85 +35,15 @@ def handle_event(event:, context:)
   $logger.info('handling event ', event)
 
   if method == 'get' && path == "/docs/holdings"
-    return respond 200, $swagger_doc
+    return HTTPMethods.respond 200, $swagger_doc
   end
 
   if method == 'get'
-    return get_holding(event)
+    return HTTPMethods.get_holding(event)
   end
 
-
-  begin
-    body = JSON.parse(event["body"])
-    records = body.map {|record| db_record(record)}
-  rescue => e
-    $logger.error('problem parsing JSON for event', { message: e.message })
-    return respond 500, { message: e.message }
+  if method == 'post'
+    return HTTPMethods.post_holding(event)
   end
 
-  $logger.info('successfully parsed records')
-
-  begin
-    Record.upsert_all(records, unique_by: :id)
-  rescue => e
-    $logger.error('problem persisting records to database', { message: e.message })
-    return respond 500, { message: e.message }
-  end
-
-  $logger.info('successfully persisted records')
-
-  begin
-    body.each {|record| $kinesis_client << record }
-  rescue => e
-    return respond 500, { message: e.message }
-  end
-
-
-  respond 200
-end
-
-def get_holding(event)
-  $logger.info('handling get request')
-  params = event['queryStringParameters']
-  $logger.info("params: #{params}")
-  if params && ids = params['ids']
-    getting_by = 'ids'
-    identifier_for_where = 'ARRAY[id]::int[]'
-  elsif params && ids = params['bib_ids']
-    getting_by = 'bib_ids'
-    identifier_for_where = 'bib_ids'
-  else
-    message = "Missing required fields ids or bib_ids"
-    $logger.info(message)
-    return respond(400, message)
-  end
-  offset = params['offset'] ? params['offset'].to_i : 0
-  limit = params['limit'] ? params['limit'].to_i : 20
-  $logger.info("getting by #{getting_by}: #{ids}, offset: #{offset}, limit: #{limit}")
-  begin
-    parsed_ids = ids.split(",").map {|id| id.to_i}
-    records = Record.where("#{identifier_for_where} && ARRAY[?]::int[]", parsed_ids).offset(offset).limit(limit)
-    $logger.info("responding 200")
-    return respond(200, records.map {|record| record.to_json})
-  rescue => e
-    message = "problem getting records with #{getting_by}: #{ids}, message: #{e.message}"
-    $logger.error(message)
-    return respond(500, message)
-  end
-end
-
-def db_record(record)
-  record.map {|k,v| [$db_fields[k], v]}.to_h
-end
-
-def respond(statusCode = 200, body = nil)
-  $logger.info("Responding with #{statusCode}", { message: body })
-
-  {
-    statusCode: statusCode,
-    body: body.to_json,
-    headers: {
-      "Content-type": "application/json"
-    }
-  }
 end
