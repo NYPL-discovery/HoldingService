@@ -1,5 +1,6 @@
 require 'spec_helper'
 require_relative '../../app.rb'
+require_relative '../../src/http_methods.rb'
 
 $mock_aws_kinesis = MockAwsKinesisClient.new
 
@@ -34,6 +35,38 @@ end
 
 describe "handle_event" do
 
+  swagger_event = {
+    "path" => "/docs/holdings",
+    "httpMethod" => "get"
+  }
+
+  mockMessage = "mockMessage"
+
+  before do
+    allow(Aws::Kinesis::Client).to receive(:new).and_return($mock_aws_kinesis)
+    allow_any_instance_of(NYPLRubyUtil::KmsClient).to receive(:decrypt).and_return('')
+    allow_any_instance_of(StandardError).to receive(:message).and_return(mockMessage)
+    allow(self).to receive(:init).and_return(nil)
+    allow($logger).to receive(:info).and_return(nil)
+    allow($logger).to receive(:error).and_return(nil)
+  end
+
+  it "should call init" do
+    expect(self).to receive(:init)
+    handle_event(event: swagger_event, context: nil)
+  end
+
+  it "should log the event" do
+    expect($logger).to receive(:info).with('handling event ', swagger_event)
+    handle_event(event: swagger_event, context: nil)
+  end
+
+  it "should respond with swagger doc in case of swagger doc path" do
+    resp = handle_event(event: swagger_event, context: nil)
+    expect(resp).to eq(HTTPMethods.respond(200, $swagger_doc))
+  end
+
+
   describe "get request" do
     get_event = {
       "path" => "",
@@ -52,12 +85,17 @@ describe "handle_event" do
     end
 
     it "should pass the event to get_holding" do
-      expect(self).to receive(:get_holding).with(get_event)
+      expect(HTTPMethods).to receive(:get_holding).with(get_event)
       handle_event(event: get_event, context: nil)
     end
   end
 
   describe "post request" do
+    post_event = {
+      "path" => "",
+      "httpMethod" => "POST"
+    }
+
     mockMessage = 'mockMessage'
 
     before do
@@ -69,10 +107,23 @@ describe "handle_event" do
       allow($logger).to receive(:error).and_return(nil)
     end
 
-    swagger_event = {
-      "path" => "/docs/holdings",
-      "httpMethod" => "get"
-    }
+    it "should pass the event to post_holding" do
+      expect(HTTPMethods).to receive(:post_holding).with(post_event)
+      handle_event(event: post_event, context: nil)
+    end
+  end
+
+  describe "post_holding" do
+    mockMessage = 'mockMessage'
+
+    before do
+      allow(Aws::Kinesis::Client).to receive(:new).and_return($mock_aws_kinesis)
+      allow_any_instance_of(NYPLRubyUtil::KmsClient).to receive(:decrypt).and_return('')
+      allow_any_instance_of(StandardError).to receive(:message).and_return(mockMessage)
+      allow(self).to receive(:init).and_return(nil)
+      allow($logger).to receive(:info).and_return(nil)
+      allow($logger).to receive(:error).and_return(nil)
+    end
 
     malformed_json_event = {
       "path" => "",
@@ -102,55 +153,45 @@ describe "handle_event" do
       "isBase64Encoded": false
     }
 
-    it "should call init" do
-      expect(self).to receive(:init)
-      handle_event(event: swagger_event, context: nil)
-    end
-
-    it "should log the event" do
-      expect($logger).to receive(:info).with('handling event ', swagger_event)
-      handle_event(event: swagger_event, context: nil)
-    end
-
-    it "should respond with swagger doc in case of swagger doc path" do
-      resp = handle_event(event: swagger_event, context: nil)
-      expect(resp).to eq(respond(200, $swagger_doc))
+    it "should log 'handling post request'" do
+      expect($logger).to receive(:info).with("handling post request")
+      HTTPMethods.post_holding(correct_event)
     end
 
     it "should log any problem parsing JSON" do
       expect($logger).to receive(:error).with('problem parsing JSON for event', { message: mockMessage })
-      resp = handle_event(event: malformed_json_event, context: nil)
+      resp = HTTPMethods.post_holding(malformed_json_event)
     end
 
     it "should respond 500 in case of malformed json" do
-      resp = handle_event(event: malformed_json_event, context: nil)
-      expect(resp).to eq(respond(500, { message: mockMessage }))
+      resp = HTTPMethods.post_holding malformed_json_event
+      expect(resp).to eq(HTTPMethods.respond(500, { message: mockMessage }))
     end
 
     it "should log any error from saving record" do
       expect($logger).to receive(:error).with('problem persisting records to database', { message: mockMessage })
-      resp = handle_event(event: bad_record_event, context: nil)
+      resp = HTTPMethods.post_holding bad_record_event
     end
 
     it "should respond 500 in case of error saving record" do
-      resp = handle_event(event: bad_record_event, context: nil)
-      expect(resp).to eq(respond(500, { message: mockMessage }))
+      resp = HTTPMethods.post_holding bad_record_event
+      expect(resp).to eq(HTTPMethods.respond(500, { message: mockMessage }))
     end
 
     it "should save the record in case of new record" do
-      resp = handle_event(event: correct_event, context: nil)
+      resp = HTTPMethods.post_holding correct_event
       expect(Record.find_by(id: 1140039)).to be_truthy
     end
 
     it "should update the record in case of old record" do
-      resp = handle_event(event: updated_correct_event, context: nil)
+      resp = HTTPMethods.post_holding updated_correct_event
       expect(Record.find_by(id: 1140039).inherit_location).to eq(true)
     end
 
     it "should push record to kinesis" do
       allow($kinesis_client).to receive(:<<).and_return(nil)
       expect($kinesis_client).to receive(:<<).with(JSON.parse(correct_event["body"]).first)
-      handle_event(event: correct_event, context: nil)
+      HTTPMethods.post_holding correct_event
     end
 
     it "should log in case of error in kinesis" do
@@ -159,23 +200,23 @@ describe "handle_event" do
       allow($mock_aws_kinesis).to receive(:put_record).and_return(mock_response)
       expect($logger).to receive(:error)
       expect($mock_aws_kinesis).to receive(:put_record)
-      handle_event(event: correct_event, context: nil)
+      HTTPMethods.post_holding correct_event
     end
 
     it "should respond 500 in case of error in kinesis" do
       mock_response = MockKinesisResponse.new
       allow(mock_response).to receive(:successful?).and_return(false)
       allow($mock_aws_kinesis).to receive(:put_record).and_return(mock_response)
-      resp = handle_event(event: correct_event, context: nil)
-      expect(resp).to eq(respond(500, { message: mockMessage }))
+      resp = HTTPMethods.post_holding correct_event
+      expect(resp).to eq(HTTPMethods.respond(500, { message: mockMessage }))
     end
 
     it "should respond 200 in case run is successful" do
       mock_response = MockKinesisResponse.new
       allow(mock_response).to receive(:successful?).and_return(true)
       allow($mock_aws_kinesis).to receive(:put_record).and_return(mock_response)
-      resp = handle_event(event: correct_event, context: nil)
-      expect(resp).to eq(respond(200))
+      resp = HTTPMethods.post_holding correct_event
+      expect(resp).to eq(HTTPMethods.respond(200))
     end
   end
 end
@@ -189,26 +230,34 @@ describe "get_holding" do
   it "should log 'handling get request'" do
     get_event = {}
     expect($logger).to receive(:info).with('handling get request')
-    get_holding(get_event)
+    HTTPMethods.get_holding(get_event)
   end
 
   it "should log params" do
     get_event = {'queryStringParameters' => { 'ids' => '1'}}
     expect($logger).to receive(:info)
     expect($logger).to receive(:info).with("params: #{get_event['queryStringParameters']}")
-    get_holding(get_event)
+    HTTPMethods.get_holding(get_event)
   end
 
   describe "missing required params" do
-    it "should log 'Missing required fields ids or bib_ids'" do
-      get_event = {}
-      expect($logger).to receive(:info).with('Missing required fields ids or bib_ids')
-      get_holding(get_event)
-    end
-
     it "should respond 400 with the 'missing' message" do
       get_event = {}
-      expect(get_holding(get_event)).to eq(respond(400, 'Missing required fields ids or bib_ids'))
+      expect(HTTPMethods.get_holding(get_event)).to eq(HTTPMethods.respond(400, 'Must have bib_id or ids'))
+    end
+  end
+
+  describe "both ids and bib_id set" do
+    it "should respond 400 with error message" do
+      get_event = {"queryStringParameters" => {"ids" => "1", "bib_id" => "2"}}
+      expect(HTTPMethods.get_holding(get_event)).to eq(HTTPMethods.respond(400, "Can only have one of ids, bib_id"))
+    end
+  end
+
+  describe "list of bib_ids" do
+    it "should respond 400 with error message" do
+      get_event = {"queryStringParameters" => {"bib_id" => "2,3"}}
+      expect(HTTPMethods.get_holding(get_event)).to eq(HTTPMethods.respond(400, "bib_id must be a single numerical value"))
     end
   end
 
@@ -219,130 +268,107 @@ describe "get_holding" do
       expect($logger).to receive(:info) do |params|
         expect(params).to include("getting by ids")
       end
-      get_holding({'queryStringParameters' => { 'ids' => '1'}})
+      HTTPMethods.get_holding({'queryStringParameters' => { 'ids' => '1'}})
     end
 
     it "should return record for one id that exists" do
       event = {'queryStringParameters' => { 'ids' => '1'}}
-      expect(self).to receive(:respond) do |*params|
+      expect(HTTPMethods).to receive(:respond) do |*params|
         expect(params[0]).to eq(200)
         body = params[1]
         expect(body.length).to eq(1)
         expect(JSON.parse(body.first)["id"]).to eq(1)
       end
-      get_holding(event)
+      HTTPMethods.get_holding(event)
     end
 
     it "should return records for two ids that exist" do
       event = {'queryStringParameters' => { 'ids' => '1,2'}}
-      expect(self).to receive(:respond) do |*params|
+      expect(HTTPMethods).to receive(:respond) do |*params|
         expect(params[0]).to eq(200)
         body = params[1]
         expect(body.length).to eq(2)
         expect(JSON.parse(body.first)["id"]).to eq(1)
         expect(JSON.parse(body.second)["id"]).to eq(2)
       end
-      get_holding(event)
+      HTTPMethods.get_holding(event)
     end
 
     it "should return one record for one id that exists and one that doesn't" do
       event = {'queryStringParameters' => { 'ids' => '1,4'}}
-      expect(self).to receive(:respond) do |*params|
+      expect(HTTPMethods).to receive(:respond) do |*params|
         expect(params[0]).to eq(200)
         body = params[1]
         expect(body.length).to eq(1)
         expect(JSON.parse(body.first)["id"]).to eq(1)
       end
-      get_holding(event)
+      HTTPMethods.get_holding(event)
     end
 
     it "should return empty array for one id that doesn't exist" do
       event = {'queryStringParameters' => { 'ids' => '4'}}
-      expect(self).to receive(:respond) do |*params|
+      expect(HTTPMethods).to receive(:respond) do |*params|
         expect(params[0]).to eq(200)
         body = params[1]
         expect(body.length).to eq(0)
       end
-      get_holding(event)
+      HTTPMethods.get_holding(event)
     end
 
     it "should log responding 200" do
       event = {'queryStringParameters' => { 'ids' => '4'}}
       expect($logger).to receive(:info).with("responding 200")
-      get_holding(event)
+      HTTPMethods.get_holding(event)
     end
   end
 
   describe "getting by bib_id" do
-    it "should log 'getting by bib_ids'" do
+    it "should log 'getting by bib_id'" do
       expect($logger).to receive(:info)
       expect($logger).to receive(:info)
       expect($logger).to receive(:info) do |params|
-        expect(params).to include("getting by bib_ids")
+        expect(params).to include("getting by bib_id")
       end
-      get_holding({'queryStringParameters' => { 'bib_ids' => '1'}})
+      HTTPMethods.get_holding({'queryStringParameters' => { 'bib_id' => '1'}})
     end
 
     it "should return record for one id that exists" do
-      event = {'queryStringParameters' => { 'bib_ids' => '1'}}
-      expect(self).to receive(:respond) do |*params|
+      event = {'queryStringParameters' => { 'bib_id' => '1'}}
+      expect(HTTPMethods).to receive(:respond) do |*params|
         expect(params[0]).to eq(200)
         body = params[1]
         expect(body.length).to eq(1)
         expect(JSON.parse(body.first)["id"]).to eq(1)
       end
-      get_holding(event)
+      HTTPMethods.get_holding(event)
     end
 
     it "should return records for one id that exists multiple times" do
-      event = {'queryStringParameters' => { 'bib_ids' => '3'}}
-      expect(self).to receive(:respond) do |*params|
+      event = {'queryStringParameters' => { 'bib_id' => '3'}}
+      expect(HTTPMethods).to receive(:respond) do |*params|
         expect(params[0]).to eq(200)
         body = params[1]
         expect(body.length).to eq(2)
         expect(JSON.parse(body.first)["id"]).to eq(1)
         expect(JSON.parse(body.second)["id"]).to eq(2)
       end
-      get_holding(event)
-    end
-
-    it "should return records for two ids that exist" do
-      event = {'queryStringParameters' => { 'bib_ids' => '1,4'}}
-      expect(self).to receive(:respond) do |*params|
-        expect(params[0]).to eq(200)
-        body = params[1]
-        expect(body.length).to eq(2)
-        expect(JSON.parse(body.first)["id"]).to eq(1)
-        expect(JSON.parse(body.second)["id"]).to eq(2)
-      end
-      get_holding(event)
-    end
-
-    it "should return one record for one id that exists and one that doesn't" do
-      event = {'queryStringParameters' => { 'bib_ids' => '1,7'}}
-      expect(self).to receive(:respond) do |*params|
-        expect(params[0]).to eq(200)
-        body = params[1]
-        expect(body.length).to eq(1)
-        expect(JSON.parse(body.first)["id"]).to eq(1)
-      end
-      get_holding(event)
+      HTTPMethods.get_holding(event)
     end
 
     it "should return empty array for one id that doesn't exist" do
-      event = {'queryStringParameters' => { 'bib_ids' => '7'}}
-      expect(self).to receive(:respond) do |*params|
+      event = {'queryStringParameters' => { 'bib_id' => '7'}}
+      expect(HTTPMethods).to receive(:respond) do |*params|
         expect(params[0]).to eq(200)
         body = params[1]
         expect(body.length).to eq(0)
       end
-      get_holding(event)
+      HTTPMethods.get_holding(event)
     end
 
     it "should log responding 200" do
-      event = {'queryStringParameters' => { 'ids' => '4'}}
+      event = {'queryStringParameters' => { 'bib_id' => '4'}}
       expect($logger).to receive(:info).with("responding 200")
-      get_holding(event)
+      HTTPMethods.get_holding(event)
     end
   end
 
@@ -351,19 +377,12 @@ describe "get_holding" do
     it 'should log the params and error' do
       allow($logger).to receive(:info).with("responding 200").and_raise(StandardError.new("Mock Error Message"))
       expect($logger).to receive(:error).with(message)
-      get_holding({'queryStringParameters' => {'ids' => '1'}})
+      HTTPMethods.get_holding({'queryStringParameters' => {'ids' => '1'}})
     end
 
     it 'should respond 500 with error message' do
       allow($logger).to receive(:info).with("responding 200").and_raise(StandardError.new("Mock Error Message"))
-      expect(get_holding({'queryStringParameters' => {'ids' => '1'}})).to eq(respond(500, message))
-    end
-  end
-
-  describe 'should handle offset and limit' do
-    it "should accept offset and limit as params and return appropriate values" do
-      expect(JSON.parse(get_holding({'queryStringParameters' => {'ids' => '1,2', 'limit' => '1'}})[:body]).length).to eq(1)
-      expect(JSON.parse(get_holding({'queryStringParameters' => {'ids' => '1,2', 'offset' => '1'}})[:body]).length).to eq(1)
+      expect(HTTPMethods.get_holding({'queryStringParameters' => {'ids' => '1'}})).to eq(HTTPMethods.respond(500, message))
     end
   end
 end

@@ -26,11 +26,11 @@
             }
           },
           {
-            "name": "bib_ids",
+            "name": "bib_id",
             "in": "query",
             "schema": {
               "type": "string",
-              "example": "1,2,3"
+              "example": "123"
             }
           },
           {
@@ -62,7 +62,7 @@
             "description": "Missing parameters",
             "schema": {
               "type": "string",
-              "example": "Missing required fields ids or bib_ids"
+              "example": "Must have bib_id or ids"
             }
           },
           "500": {
