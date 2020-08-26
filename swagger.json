@@ -10,6 +10,70 @@
   },
   "paths": {
     "/v0.1/holdings": {
+      "get": {
+        "tags": [
+          "holdings"
+        ],
+        "summary": "Get holdings records",
+        "operationId": "getHolding",
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "1,2,3"
+            }
+          },
+          {
+            "name": "bib_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "123"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "10"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "10"
+            }
+          }
+        ],
+        "responses" : {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "type": "string",
+              "example": "[\"{\\\"id\\\":1,\\\"bib_ids\\\":[1,2,3],\\\"bib_id_links\\\":[],\\\"item_ids\\\":[],\\\"item_id_links\\\":[],\\\"inherit_location\\\":null,\\\"allocation_rule\\\":null,\\\"accounting_unit\\\":1,\\\"label_code\\\":\\\"blah\\\",\\\"serial_code_1\\\":null,\\\"serial_code_2\\\":null,\\\"serial_code_3\\\":null,\\\"serial_code_4\\\":null,\\\"claim_on_date\\\":null,\\\"receiving_location_code\\\":null,\\\"vendor_code\\\":null,\\\"update_count\\\":null,\\\"piece_count\\\":null,\\\"e_check_in_code\\\":null,\\\"media_type_code\\\":null,\\\"updated_date\\\":null,\\\"created_date\\\":\\\"2020-07-29\\\",\\\"deleted_date\\\":null,\\\"deleted\\\":null,\\\"suppressed\\\":null,\\\"fixed_fields\\\":{},\\\"var_fields\\\":{},\\\"holdings\\\":{\\\"a\\\":1,\\\"b\\\":[2,3]},\\\"location\\\":null}\"]"
+            }
+          },
+          "400": {
+            "description": "Missing parameters",
+            "schema": {
+              "type": "string",
+              "example": "Must have bib_id or ids"
+            }
+          },
+          "500": {
+            "description": "Internal db error",
+            "schema": {
+              "type": "string",
+              "example": "Problem getting records with ids: 1, message: some error message"
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
           "holdings"

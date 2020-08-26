@@ -1,5 +1,6 @@
 require 'pg'
 require 'active_record'
+require_relative '../models/record'
 
 def init_db
   ActiveRecord::Schema.define do
@@ -39,4 +40,71 @@ def init_db
       t.jsonb :location, default: {}
     end
   end
+
+  record_1 = {
+    "id"=>1,
+    "bib_ids"=>[1, 2, 3],
+    "bib_id_links"=>[],
+    "item_ids"=>[],
+    "item_id_links"=>[],
+    "inherit_location"=>nil,
+    "allocation_rule"=>nil,
+    "accounting_unit"=>1,
+    "label_code"=>"blah",
+    "serial_code_1"=>nil,
+    "serial_code_2"=>nil,
+    "serial_code_3"=>nil,
+    "serial_code_4"=>nil,
+    "claim_on_date"=>nil,
+    "receiving_location_code"=>nil,
+    "vendor_code"=>nil,
+    "update_count"=>nil,
+    "piece_count"=>nil,
+    "e_check_in_code"=>nil,
+    "media_type_code"=>nil,
+    "updated_date"=>nil,
+    "created_date"=>"2020-07-29",
+    "deleted_date"=>nil,
+    "deleted"=>nil,
+    "suppressed"=>nil,
+    "fixed_fields"=>{},
+    "var_fields"=>{},
+    "holdings"=>{"a"=>1, "b"=>[2, 3]},
+    "location"=>nil
+  }
+
+  record_2 = {
+    "id"=>2,
+    "bib_ids"=>[3,4,5],
+    "bib_id_links"=>[],
+    "item_ids"=>[],
+    "item_id_links"=>[],
+    "inherit_location"=>nil,
+    "allocation_rule"=>nil,
+    "accounting_unit"=>1,
+    "label_code"=>"blah",
+    "serial_code_1"=>nil,
+    "serial_code_2"=>nil,
+    "serial_code_3"=>nil,
+    "serial_code_4"=>nil,
+    "claim_on_date"=>nil,
+    "receiving_location_code"=>nil,
+    "vendor_code"=>nil,
+    "update_count"=>nil,
+    "piece_count"=>nil,
+    "e_check_in_code"=>nil,
+    "media_type_code"=>nil,
+    "updated_date"=>nil,
+    "created_date"=>"2020-07-29",
+    "deleted_date"=>nil,
+    "deleted"=>nil,
+    "suppressed"=>nil,
+    "fixed_fields"=>{},
+    "var_fields"=>{},
+    "holdings"=>{"a"=>1, "b"=>[2, 3]},
+    "location"=>nil
+  }
+
+  Record.create record_1
+  Record.create record_2
 end
