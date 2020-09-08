@@ -55,6 +55,7 @@ export SET BUNDLE_IGNORE_CONFIG=true; bundle exec rspec
 Deployment is handled by travis for the following branches:
 
 - `qa`
+- `production`
 
 
 ## Managing
