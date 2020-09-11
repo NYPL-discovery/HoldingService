@@ -51,7 +51,7 @@ class HTTPMethods
       parsed_ids = ids.split(",").map {|id| id.to_i}
       records = Record.where("#{identifier_for_where} && ARRAY[?]::int[]", parsed_ids)
       $logger.info("responding 200")
-      return respond(200, records.map {|record| record.to_json})
+      return respond(200, records)
     rescue => e
       message = "problem getting records with #{getting_by}: #{ids}, message: #{e.message}"
       $logger.error(message)
@@ -61,7 +61,7 @@ class HTTPMethods
 
   def self.check_for_param_errors(params)
     error_messages = []
-    if !params
+    if !params || params.keys.length == 0
       error_messages << "Must have bib_id or ids"
     elsif params['ids'] && params['bib_id']
       error_messages << "Can only have one of ids, bib_id"
@@ -104,8 +104,6 @@ class HTTPMethods
     respond 200
   end
 
-
-
   def self.db_record(record)
     record.map {|k,v| [$db_fields[k], v]}.to_h
   end
@@ -122,5 +120,4 @@ class HTTPMethods
       }
     }
   end
-
 end
