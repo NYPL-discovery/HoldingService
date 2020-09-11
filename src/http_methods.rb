@@ -1,12 +1,42 @@
 require 'nypl_ruby_util'
 require_relative '../models/record'
 
-
 class HTTPMethods
+  def self.get_holdings_req(event)
+    $logger.info('handling GET request')
 
-  def self.get_holding(event)
-    $logger.info('handling get request')
     params = event['queryStringParameters']
+    path_params = event['pathParameters']
+
+    if path_params.key? 'id'
+      return get_holding(path_params['id'])
+    else
+      return get_holdings(params)
+    end
+  end
+
+  def self.get_holding id
+    $logger.info("Retrieving holding record for #{id}")
+
+    begin
+      record = Record.find_by id: id
+      $logger.debug(record)
+      
+      if record
+        $logger.info("Fetched record for #{id}, returning 200")
+        return respond(200, record)
+      else
+        $logger.info("No matching record with #{id}")
+        return respond(404, "No record exists with id #{id}")
+      end
+    rescue => e
+      $logger.error("Unable to retrieve record #{id}")
+      $logger.debug(e.message)
+      return respond(500, "Unable to retrieve record #{id} with message #{e.message}")
+    end
+  end
+
+  def self.get_holdings params
     $logger.info("params: #{params}")
     errors = check_for_param_errors(params)
     return errors if errors
