@@ -45,7 +45,6 @@ class HTTPMethods
 
   def self.post_holding(event)
     $logger.info("handling post request")
-
     begin
       body = JSON.parse(event["body"])
       records = body.map {|record| db_record(record)}
