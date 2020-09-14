@@ -11,7 +11,6 @@ def init
   $logger.info 'env: ', ENV.sort
   kms_client =  NYPLRubyUtil::KmsClient.new(ENV['KMS_OPTIONS'] ? JSON.parse(ENV['KMS_OPTIONS']) : {})
   password = kms_client.decrypt(ENV['DB_PASSWORD'])
-  $logger.info 'authenticating with password: ', { message: password }
   ActiveRecord::Base.establish_connection(
     adapter: 'postgresql',
     database: ENV['DATABASE'],
