@@ -55,6 +55,9 @@ class HTTPMethods
     end
 
     $logger.info('successfully parsed records')
+    records.each do |record|
+      $logger.info("record: ", record)
+    end
 
     begin
       Record.upsert_all(records, unique_by: :id)
