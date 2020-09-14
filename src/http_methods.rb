@@ -71,7 +71,7 @@ class HTTPMethods
       return respond 500, { message: e.message }
     end
 
-    respond 200
+    respond 200, { "message": "Stored #{body.length} records Successfully", "errors": []}
   end
 
 
