@@ -3,7 +3,8 @@ require 'active_record'
 def init_db
   ActiveRecord::Schema.define do
     create_table :records do |t|
-      t.integer :bib_id, array: true, default: []
+      t.index :id, unique: true
+      t.integer :bib_ids, array: true, default: []
       t.string :bib_id_links, array: true, default: []
       t.integer :item_ids, array: true, default: []
       t.string :item_id_links, array: true, default: []
@@ -30,6 +31,8 @@ def init_db
       t.jsonb :fixed_fields, default: {}
       t.jsonb :var_fields, default: {}
       t.jsonb :holdings, default: {}
+      t.jsonb :location, default: {}
+      t.jsonb :check_in_cards, default: {}
     end
   end
 end

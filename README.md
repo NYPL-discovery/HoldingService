@@ -11,6 +11,22 @@ rvm use
 bundle install
 psql -c 'create database test_holdings;' -U postgres
 ```
+
+The method `init_db` in `holding-schema.rb` defines the schema for the `records` table, which the app will use. You can initialize this table by connecting to the db
+
+```
+ActiveRecord::Base.establish_connection(
+  adapter: 'postgresql',
+  database: ENV['DATABASE'],
+  host: ENV['DB_HOST'],
+  username: ENV['DB_USERNAME'],
+  password: password
+)
+```
+
+and running `init_db`
+
+
 Lambdas with native extensions are a little tricky. You will need to bundle in the docker image:
 
 Build the image:

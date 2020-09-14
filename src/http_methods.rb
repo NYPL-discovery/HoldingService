@@ -45,7 +45,6 @@ class HTTPMethods
 
   def self.post_holding(event)
     $logger.info("handling post request")
-
     begin
       body = JSON.parse(event["body"])
       records = body.map {|record| db_record(record)}
@@ -74,7 +73,7 @@ class HTTPMethods
       return respond 500, { message: e.message }
     end
 
-    respond 200
+    respond 200, { "message": "Stored #{body.length} records Successfully", "errors": []}
   end
 
 
