@@ -200,4 +200,21 @@ describe 'HoldingService' do
       expect(resp_record).to eq('No record exists with id 5')
     end
   end
+
+  describe 'GET /docs/holdings' do
+    it 'should return the swagger documentation' do
+      event = {
+        'path' => '/docs/holdings',
+        'httpMethod' => 'GET',
+        'queryStringParameters' => {},
+        'pathParameters' => {}
+      }
+
+      resp = handle_event(event: event, context: {})
+      resp_record = JSON.parse(resp[:body])
+
+      expect(resp_record['swagger']).to eq('2.0')
+      expect(resp_record['info']['title']).to eq('Holding Service')
+    end
+  end
 end
