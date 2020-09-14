@@ -216,7 +216,7 @@ describe "handle_event" do
       allow(mock_response).to receive(:successful?).and_return(true)
       allow($mock_aws_kinesis).to receive(:put_record).and_return(mock_response)
       resp = HTTPMethods.post_holding correct_event
-      expect(resp).to eq(HTTPMethods.respond(200))
+      expect(resp).to eq(HTTPMethods.respond(200, { "message": "Stored #{JSON.parse(correct_event["body"]).length} records Successfully", "errors": []}))
     end
   end
 end
