@@ -38,6 +38,7 @@ def init_db
       t.jsonb :var_fields, default: {}
       t.jsonb :holdings, default: {}
       t.jsonb :location, default: {}
+      t.jsonb :check_in_cards, default: {}
     end
   end
 

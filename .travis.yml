@@ -30,8 +30,8 @@ deploy:
   environment:
     variables:
       DATABASE: holdings
-      DB_HOST: holdings-qa.cluster-cvy7z512hcjg.us-east-1.rds.amazonaws.com
-      DB_PASSWORD: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAHIwcAYJKoZIhvcNAQcGoGMwYQIBADBcBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDK3yY4Th18HMKDTShgIBEIAvPk1ebdH9CUW4ObYCntibF3ePRcjRrdkejxGe8qiSNiwoGhH1MnyfS/69CG9raG8=
+      DB_HOST: hold-requests-qa.cvy7z512hcjg.us-east-1.rds.amazonaws.com
+      DB_PASSWORD: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAG0wawYJKoZIhvcNAQcGoF4wXAIBADBXBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDCj1YNcdPDKcMz07hAIBEIAqsbZ0ryAqgiX49AWWCFoxIIGJeqflZQ/x+B13BP5E1kpSHisFyRN+cF4n
       DB_USERNAME: holdings_user
       LOG_LEVEL: info
       PLATFORM_API_BASE_URL: https://qa-platform.nypl.org/api/v0.1/
@@ -62,8 +62,8 @@ deploy:
   environment:
     variables:
       DATABASE: holdings
-      DB_HOST: holdings-qa.cluster-cvy7z512hcjg.us-east-1.rds.amazonaws.com
-      DB_PASSWORD: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAHIwcAYJKoZIhvcNAQcGoGMwYQIBADBcBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDK3yY4Th18HMKDTShgIBEIAvPk1ebdH9CUW4ObYCntibF3ePRcjRrdkejxGe8qiSNiwoGhH1MnyfS/69CG9raG8=
+      DB_HOST: holdings-prod.cvy7z512hcjg.us-east-1.rds.amazonaws.com
+      DB_PASSWORD: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAHIwcAYJKoZIhvcNAQcGoGMwYQIBADBcBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDCYNEtHEX0rm+JlApAIBEIAv59Aq6AT6Csx3IFsIuLu0S3JaKJw1PMMSKYu0l5N3LGNLheLunXVrl/pxzQ17gGk=
       DB_USERNAME: holdings_user
       LOG_LEVEL: info
       PLATFORM_API_BASE_URL: https://platform.nypl.org/api/v0.1/
