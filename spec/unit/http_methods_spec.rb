@@ -141,7 +141,7 @@ describe HTTPMethods do
             expect(HTTPMethods).to receive(:db_record).with({ 'id' => 1 }).and_return('test_record')
             expect(Record).to receive(:upsert_all).with(['test_record'], unique_by: :id)
             expect($kinesis_client).to receive(:<<).with({ 'id' => 1 })
-            expect(HTTPMethods).to receive(:respond).with(200).and_return(200)
+            expect(HTTPMethods).to receive(:respond).with(200, {:errors => [], :message => 'Stored 1 records Successfully'}).and_return(200)
 
             res = HTTPMethods.post_holding({
                 'body' => '[{"id":1}]'
