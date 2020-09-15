@@ -20,34 +20,26 @@
           {
             "name": "ids",
             "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "1,2,3"
-            }
+            "type": "string",
+            "required": false
           },
           {
             "name": "bib_id",
             "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "123"
-            }
+            "type": "string",
+            "required": false
           },
           {
             "name": "offset",
             "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "10"
-            }
+            "type": "string",
+            "required": false
           },
           {
             "name": "limit",
             "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "10"
-            }
+            "type": "string",
+            "required": false
           }
         ],
         "responses" : {
@@ -123,10 +115,9 @@
           {
             "name": "id",
             "in": "path",
-            "schema": {
-              "type": "integer",
-              "example": 1
-            }
+            "required": true,
+            "type": "string",
+            "format": "string"
           }
         ],
         "responses": {
@@ -159,6 +150,9 @@
         "id"
       ],
       "properties": {
+        "id": {
+          "type": "integer"
+        },
         "bibIds" : {
           "type": "array",
           "items": {
@@ -264,6 +258,9 @@
         "id"
       ],
       "properties": {
+        "id": {
+          "type": "integer"
+        },
         "bib_ids" : {
           "type": "array",
           "items": {
@@ -382,7 +379,7 @@
           "type": "integer"
         },
         "enumeration": {
-          "$ref": "#/definitions/Enumeration"
+          "$ref": "#/definitions/CheckInCardEnumeration"
         },
         "start_date": {
           "type": "string"
@@ -419,7 +416,7 @@
         }
       }
     },
-    "Enumeration": {
+    "CheckInCardEnumeration": {
       "type": "object",
       "properties": {
         "enumeration": {
@@ -433,7 +430,7 @@
         }
       }
     },
-    "Status": {
+    "CheckInCardStatus": {
       "type": "object",
       "properties": {
         "code": {
