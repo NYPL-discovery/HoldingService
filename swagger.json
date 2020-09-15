@@ -21,7 +21,7 @@
             "name": "ids",
             "in": "query",
             "type": "string",
-            "required": false,
+            "required": false
           },
           {
             "name": "bib_id",
