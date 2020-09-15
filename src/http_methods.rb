@@ -40,20 +40,23 @@ class HTTPMethods
     $logger.info("params: #{params}")
     errors = check_for_param_errors(params)
     return errors if errors
+
     if params['ids']
-      ids, getting_by, identifier_for_where = [params['ids'], 'ids', 'ARRAY[id]::int[]']
+      ids = params['ids']
+      query = "id IN (#{ids})"
+    else
+      bib_id = params['bib_id']
+      query = "#{bib_id} = ANY(\"bibIds\")"
     end
-    if params['bib_id']
-      ids, getting_by, identifier_for_where = [params['bib_id'], 'bib_id', 'bib_ids']
-    end
-    $logger.info("getting by #{getting_by}: #{ids}")
+
+    $logger.info("getting holdings by query: #{query}")
+
     begin
-      parsed_ids = ids.split(",").map {|id| id.to_i}
-      records = Record.where("#{identifier_for_where} && ARRAY[?]::int[]", parsed_ids)
+      records = Record.where(query)
       $logger.info("responding 200")
       return respond(200, records)
     rescue => e
-      message = "problem getting records with #{getting_by}: #{ids}, message: #{e.message}"
+      message = "problem getting records with query: #{query}, message: #{e.message}"
       $logger.error(message)
       return respond(500, message)
     end
@@ -76,8 +79,7 @@ class HTTPMethods
   def self.post_holding(event)
     $logger.info("handling post request")
     begin
-      body = JSON.parse(event["body"])
-      records = body.map {|record| db_record(record)}
+      records = JSON.parse(event["body"])
     rescue => e
       $logger.error('problem parsing JSON for event', { message: e.message })
       return respond 500, { message: e.message }
@@ -95,18 +97,13 @@ class HTTPMethods
     $logger.info('successfully persisted records')
 
     begin
-      body.each {|record| $kinesis_client << record }
+      records.each {|record| $kinesis_client << record }
     rescue => e
       return respond 500, { message: e.message }
     end
 
-    respond 200, { "message": "Stored #{body.length} records Successfully", "errors": []}
+    respond 200, { "message": "Stored #{records.length} records Successfully", "errors": []}
   end
-
-  def self.db_record(record)
-    record.map {|k,v| [$db_fields[k], v]}.to_h
-  end
-
 
   def self.respond(statusCode = 200, body = nil)
     $logger.info("Responding with #{statusCode}", { message: body })

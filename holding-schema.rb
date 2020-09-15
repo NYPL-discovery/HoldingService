@@ -4,35 +4,35 @@ def init_db
   ActiveRecord::Schema.define do
     create_table :records do |t|
       t.index :id, unique: true
-      t.integer :bib_ids, array: true, default: []
-      t.string :bib_id_links, array: true, default: []
-      t.integer :item_ids, array: true, default: []
-      t.string :item_id_links, array: true, default: []
-      t.boolean :inherit_location
-      t.string :allocation_rule
-      t.integer :accounting_unit
-      t.string :label_code
-      t.string :serial_code_1
-      t.string :serial_code_2
-      t.string :serial_code_3
-      t.string :serial_code_4
-      t.string :claim_on_date
-      t.string :receiving_location_code
-      t.string :vendor_code
-      t.string :update_count
-      t.integer :piece_count
-      t.string :e_check_in_code
-      t.string :media_type_code
-      t.date :updated_date
-      t.date :created_date
-      t.date :deleted_date
+      t.integer :bibIds, array: true, default: []
+      t.string :bibIdLinks, array: true, default: []
+      t.integer :itemIds, array: true, default: []
+      t.string :itemIdLinks, array: true, default: []
+      t.boolean :inheritLocation
+      t.string :allocationRule
+      t.integer :accountingUnit
+      t.string :labelCode
+      t.string :serialCode1
+      t.string :serialCode2
+      t.string :serialCode3
+      t.string :serialCode4
+      t.string :claimOnDate
+      t.string :receivingLocationCode
+      t.string :vendorCode
+      t.string :updateCount
+      t.integer :pieceCount
+      t.string :eCheckInCode
+      t.string :mediaTypeCode
+      t.date :updatedDate
+      t.date :createdDate
+      t.date :deletedDate
       t.boolean :deleted
       t.boolean :suppressed
-      t.jsonb :fixed_fields, default: {}
-      t.jsonb :var_fields, default: {}
+      t.jsonb :fixedFields, default: {}
+      t.jsonb :varFields, default: {}
       t.jsonb :holdings, default: {}
       t.jsonb :location, default: {}
-      t.jsonb :check_in_cards, default: {}
+      t.jsonb :checkInCards, default: {}
     end
   end
 end

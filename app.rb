@@ -18,7 +18,7 @@ def init
     username: ENV['DB_USERNAME'],
     password: password
   )
-  $db_fields = Hash.new { |h,k| h[k] = k.gsub(/([a-z])([^a-z])/){"#{$1}_#{$2.downcase}"}  }
+
   $kinesis_client = NYPLRubyUtil::KinesisClient.new(
     schema_string: ENV['SCHEMA_STRING'],
     stream_name: ENV['STREAM_NAME']

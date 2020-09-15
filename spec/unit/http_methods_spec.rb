@@ -72,7 +72,7 @@ describe HTTPMethods do
         it 'should return 200 if query with ids is successful' do
             test_params = { 'ids' => '1,2,3' }
             expect(HTTPMethods).to receive(:check_for_param_errors).with(test_params).and_return(nil)
-            expect(Record).to receive(:where).with('ARRAY[id]::int[] && ARRAY[?]::int[]', [1, 2, 3]).and_return([
+            expect(Record).to receive(:where).with('id IN (1,2,3)').and_return([
                 { 'test' => 1 }, { 'test' => 2 }, { 'test' => 3 }
             ])
             expect(HTTPMethods).to receive(:respond).with(200, [
@@ -87,7 +87,7 @@ describe HTTPMethods do
         it 'should return 200 if query with bib_id is successful' do
             test_params = { 'bib_id' => '1' }
             expect(HTTPMethods).to receive(:check_for_param_errors).with(test_params).and_return(nil)
-            expect(Record).to receive(:where).with('bib_ids && ARRAY[?]::int[]', [1]).and_return([
+            expect(Record).to receive(:where).with('1 = ANY("bibIds")').and_return([
                 { 'test' => 1 }, { 'test' => 2 }, { 'test' => 3 }
             ])
             expect(HTTPMethods).to receive(:respond).with(200, [
@@ -102,8 +102,8 @@ describe HTTPMethods do
         it 'should return 500 if query is unsuccessful' do
             test_params = { 'bib_id' => '1' }
             expect(HTTPMethods).to receive(:check_for_param_errors).with(test_params).and_return(nil)
-            expect(Record).to receive(:where).with('bib_ids && ARRAY[?]::int[]', [1]).and_raise(StandardError, 'Test Error')
-            expect(HTTPMethods).to receive(:respond).with(500, 'problem getting records with bib_id: 1, message: Test Error').and_return(500)
+            expect(Record).to receive(:where).with('1 = ANY("bibIds")').and_raise(StandardError, 'Test Error')
+            expect(HTTPMethods).to receive(:respond).with(500, 'problem getting records with query: 1 = ANY("bibIds"), message: Test Error').and_return(500)
 
             res = HTTPMethods.get_holdings(test_params)
 
@@ -138,8 +138,7 @@ describe HTTPMethods do
         end
 
         it 'should return 200 if record is successfully stored in database and sent to kinesis' do
-            expect(HTTPMethods).to receive(:db_record).with({ 'id' => 1 }).and_return('test_record')
-            expect(Record).to receive(:upsert_all).with(['test_record'], unique_by: :id)
+            expect(Record).to receive(:upsert_all).with([{"id" => 1}], unique_by: :id)
             expect($kinesis_client).to receive(:<<).with({ 'id' => 1 })
             expect(HTTPMethods).to receive(:respond).with(200, {:errors => [], :message => 'Stored 1 records Successfully'}).and_return(200)
 
@@ -162,8 +161,7 @@ describe HTTPMethods do
         end
 
         it 'should return 500 if unable to persist record in database' do
-            expect(HTTPMethods).to receive(:db_record).with({ 'id' => 1 }).and_return('test_record')
-            expect(Record).to receive(:upsert_all).with(['test_record'], unique_by: :id).and_raise(StandardError, 'Test DB Error')
+            expect(Record).to receive(:upsert_all).with([{ "id" => 1 }], unique_by: :id).and_raise(StandardError, 'Test DB Error')
             expect(HTTPMethods).to receive(:respond).with(500, { message: 'Test DB Error'}).and_return(500)
 
             res = HTTPMethods.post_holding({
@@ -174,8 +172,7 @@ describe HTTPMethods do
         end
 
         it 'should return 500 if unable to send processed records to kinesis stream' do
-            expect(HTTPMethods).to receive(:db_record).with({ 'id' => 1 }).and_return('test_record')
-            expect(Record).to receive(:upsert_all).with(['test_record'], unique_by: :id)
+            expect(Record).to receive(:upsert_all).with([{ "id" => 1 }], unique_by: :id)
             expect($kinesis_client).to receive(:<<).with({ 'id' => 1 }).and_raise(StandardError, 'Test Kinesis Error')
             expect(HTTPMethods).to receive(:respond).with(500, { message: 'Test Kinesis Error' }).and_return(500)
 
@@ -184,20 +181,6 @@ describe HTTPMethods do
             })
 
             expect(res).to eq(500)
-        end
-    end
-
-    describe :db_record do
-        before do
-            $db_fields = Hash.new { |h,k| h[k] = k.gsub(/([a-z])([^a-z])/){"#{$1}_#{$2.downcase}"} }
-        end
-
-        it 'should transform camelCase keys into snake_case' do
-            expect(HTTPMethods.db_record({ 'bibId' => 1 })['bib_id']).to eq(1)
-        end
-
-        it 'should leave non-camel, lowercase fields as-is' do
-            expect(HTTPMethods.db_record({ 'testfield' => 1 })['testfield']).to eq(1)
         end
     end
 

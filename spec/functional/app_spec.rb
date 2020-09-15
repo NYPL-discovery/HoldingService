@@ -60,7 +60,7 @@ describe 'HoldingService' do
     it "should update the record in case of old record" do
       expect_any_instance_of(NYPLRubyUtil::KinesisClient).to receive(:<<).with(JSON.parse(updated_correct_event["body"]).first)
       resp = handle_event(event: updated_correct_event, context: {})
-      expect(Record.find_by(id: 1140039).inherit_location).to eq(true)
+      expect(Record.find_by(id: 1140039).inheritLocation).to eq(true)
     end
   end
 
