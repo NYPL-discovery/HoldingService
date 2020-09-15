@@ -35,14 +35,12 @@ def handle_event(event:, context:)
 
   if method == 'get' && path == "/docs/holdings"
     return HTTPMethods.respond 200, $swagger_doc
-  end
-
-  if method == 'get'
-    return HTTPMethods.get_holding(event)
-  end
-
-  if method == 'post'
-    return HTTPMethods.post_holding(event)
+  elsif method == 'get'
+    return HTTPMethods.get_holdings_req event
+  elsif method == 'post'
+    return HTTPMethods.post_holding event
+  else
+    return HTTPMethods.respond 500, "Path '#{path}' or Method '#{method}' not allowed"
   end
 
 end

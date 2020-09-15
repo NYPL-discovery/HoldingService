@@ -20,34 +20,26 @@
           {
             "name": "ids",
             "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "1,2,3"
-            }
+            "type": "string",
+            "required": false
           },
           {
             "name": "bib_id",
             "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "123"
-            }
+            "type": "string",
+            "required": false
           },
           {
             "name": "offset",
             "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "10"
-            }
+            "type": "string",
+            "required": false
           },
           {
             "name": "limit",
             "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "10"
-            }
+            "type": "string",
+            "required": false
           }
         ],
         "responses" : {
@@ -114,6 +106,41 @@
           }
         }
       }
+    },
+    "/v0.1/holdings/{id}": {
+      "get": {
+        "tags": ["holdings"],
+        "summary": "Get single holding record by holding id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful query and fetch from the database",
+            "schema": {
+              "$ref": "#/definitions/ResponseRecord"
+            }
+          },
+          "404": {
+            "description": "Unable to find matching record for holding_id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Generic Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
     }
   },
   "definitions" : {
@@ -123,6 +150,9 @@
         "id"
       ],
       "properties": {
+        "id": {
+          "type": "integer"
+        },
         "bibIds" : {
           "type": "array",
           "items": {
@@ -221,6 +251,195 @@
         }
       },
       "type": "object"
+    },
+    "ResponseRecord": {
+      "title": "Response Record",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "bib_ids" : {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "bib_id_inks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "item_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "item_id_links": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "inherit_location": {
+          "type": "boolean"
+        },
+        "allocation_rule": {
+          "type": "string"
+        },
+        "accounting_unit": {
+          "type": "integer"
+        },
+        "label_code": {
+          "type": "string"
+        },
+        "serial_code1": {
+          "type": "string"
+        },
+        "serial_code2": {
+          "type": "string"
+        },
+        "serial_code3": {
+          "type": "string"
+        },
+        "serial_code4": {
+          "type": "string"
+        },
+        "claim_on_date": {
+          "type": "string"
+        },
+        "receiving_location_code": {
+          "type": "string"
+        },
+        "vendor_code": {
+          "type": "string"
+        },
+        "update_count": {
+          "type": "string"
+        },
+        "piece_count": {
+          "type": "integer"
+        },
+        "e_check_in_code": {
+          "type": "string"
+        },
+        "media_type_code": {
+          "type": "string"
+        },
+        "updated_date": {
+          "type": "string"
+        },
+        "created_date": {
+          "type": "string"
+        },
+        "deleted_date": {
+          "type": "string"
+        },
+        "deleted": {
+          "type": "boolean"
+        },
+        "suppressed": {
+          "type": "boolean"
+        },
+        "fixed_fields": {
+          "type": "object"
+        },
+        "var_fields": {
+          "type": "object"
+        },
+        "holdings": {
+          "type": "object"
+        },
+        "locations": {
+          "type": "object"
+        },
+        "check_in_cards": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CheckInCard"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "CheckInCard": {
+      "type": "object",
+      "properties": {
+        "box_id": {
+          "type": "integer"
+        },
+        "holding_id": {
+          "type": "integer"
+        },
+        "box_count": {
+          "type": "integer"
+        },
+        "enumeration": {
+          "$ref": "#/definitions/CheckInCardEnumeration"
+        },
+        "start_date": {
+          "type": "string"
+        },
+        "end_date": {
+          "type": "string"
+        },
+        "trans_start_date": {
+          "type": "string"
+        },
+        "trans_end_date": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/CheckInCardStatus"
+        },
+        "claim_count": {
+          "type": "integer"
+        },
+        "copy_count": {
+          "type": "integer"
+        },
+        "url": {
+          "type": "string"
+        },
+        "suppressed": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "staff_note": {
+          "type": "string"
+        }
+      }
+    },
+    "CheckInCardEnumeration": {
+      "type": "object",
+      "properties": {
+        "enumeration": {
+          "type": "string"
+        },
+        "levels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "CheckInCardStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        }
+      }
     },
     "Error": {
       "properties": {
