@@ -25,10 +25,6 @@ describe 'app' do
             expect($logger.class).to eq(RSpec::Mocks::Double)
         end
         
-        it "should initialize db_fields" do
-            expect($db_fields.class).to eq(Hash)
-        end
-        
         it "should initialize kinesis_client" do
             expect($kinesis_client).to eq('mock_kinesis')
         end

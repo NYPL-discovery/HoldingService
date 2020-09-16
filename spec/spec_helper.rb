@@ -11,7 +11,8 @@ ActiveRecord::Base.establish_connection(
   host: ENV['DB_HOST'],
   username: ENV['DB_USERNAME']
 )
-init_db
+
+create_test_db
 
 class MockKinesisResponse
   def successful?
