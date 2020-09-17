@@ -1,5 +1,7 @@
 # Holding Service
 
+[![Build Status](https://travis-ci.com/NYPL-discovery/HoldingService.svg?branch=master)](https://travis-ci.com/NYPL-discovery/HoldingService) [![GitHub version](https://badge.fury.io/gh/nypl-discovery%2FHoldingService.svg)](https://badge.fury.io/gh/nypl-discovery%2FHoldingService)
+
 ## Purpose
 
 This endpoint receives http requests containing new and updated holding statements, saves them, and passes them on to the configured Kinesis stream
