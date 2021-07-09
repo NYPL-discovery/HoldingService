@@ -19,8 +19,7 @@ describe HTTPMethods do
             string_params = {
                 'queryStringParameters' => {
                     'ids' => '1,2,3'
-                },
-                'pathParameters' => {}
+                }
             }
             expect(HTTPMethods).to receive(:get_holdings).with(string_params['queryStringParameters']).and_return('test_multi_holdings')
 

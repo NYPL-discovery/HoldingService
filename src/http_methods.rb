@@ -6,7 +6,7 @@ class HTTPMethods
     $logger.info('handling GET request')
 
     params = event['queryStringParameters']
-    path_params = event['pathParameters']
+    path_params = event['pathParameters'] || {}
 
     if path_params.key? 'id'
       return get_holding(path_params['id'])
