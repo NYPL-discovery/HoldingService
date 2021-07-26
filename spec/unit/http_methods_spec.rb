@@ -116,7 +116,7 @@ describe HTTPMethods do
         it 'should return 500 if query is unsuccessful' do
             test_params = { 'bib_id' => '1' }
             expect(HTTPMethods).to receive(:check_for_param_errors).with(test_params).and_return(nil)
-            expect(Record).to receive(:where).with('1 = ANY("bibIds")').and_raise(StandardError, 'Test Error')
+            expect(Record).to receive(:where).with('\'{1}\' && "bibIds"').and_raise(StandardError, 'Test Error')
             expect(HTTPMethods).to receive(:respond).with(500, 'problem getting records with query: 1 = ANY("bibIds"), message: Test Error').and_return(500)
 
             res = HTTPMethods.get_holdings(test_params)
@@ -147,7 +147,7 @@ describe HTTPMethods do
 
         it 'should return 400 error if bib_ids contains invalid characters' do
             expect(HTTPMethods).to receive(:respond).with(400, 'bib_ids must contain comma-delimited numerical values').and_return(400)
-            expect(HTTPMethods.check_for_param_errors({ 'bib_id' => '1,2,abc' })).to eq(400)
+            expect(HTTPMethods.check_for_param_errors({ 'bib_ids' => '1,2,abc' })).to eq(400)
         end
     end
 
