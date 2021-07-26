@@ -44,9 +44,9 @@ class HTTPMethods
     if params['ids']
       ids = params['ids']
       query = "id IN (#{ids})"
-    else
-      bib_id = params['bib_id']
-      query = "#{bib_id} = ANY(\"bibIds\")"
+    elsif params['bib_id'] || params['bib_ids']
+      bib_ids = params['bib_id'] || params['bib_ids']
+      query = "'{#{bib_ids}}' && \"bibIds\""
     end
 
     $logger.info("getting holdings by query: #{query}")
@@ -70,6 +70,8 @@ class HTTPMethods
       error_messages << "Can only have one of ids, bib_id"
     elsif params['bib_id'] && !params['bib_id'].match(/^\d+$/)
       error_messages << "bib_id must be a single numerical value"
+    elsif params['bib_ids'] && !params['bib_ids'].match(/^[\d\,]+$/)
+      error_messages << "bib_ids must contain comma-delimited numerical values"
     end
     if !error_messages.empty?
       return respond(400, error_messages.join(", "))
