@@ -117,7 +117,7 @@ describe HTTPMethods do
             test_params = { 'bib_id' => '1' }
             expect(HTTPMethods).to receive(:check_for_param_errors).with(test_params).and_return(nil)
             expect(Record).to receive(:where).with('\'{1}\' && "bibIds"').and_raise(StandardError, 'Test Error')
-            expect(HTTPMethods).to receive(:respond).with(500, 'problem getting records with query: 1 = ANY("bibIds"), message: Test Error').and_return(500)
+            expect(HTTPMethods).to receive(:respond).with(500, 'problem getting records with query: \'{1}\' && "bibIds", message: Test Error').and_return(500)
 
             res = HTTPMethods.get_holdings(test_params)
 
