@@ -86,7 +86,22 @@ describe HTTPMethods do
         it 'should return 200 if query with bib_id is successful' do
             test_params = { 'bib_id' => '1' }
             expect(HTTPMethods).to receive(:check_for_param_errors).with(test_params).and_return(nil)
-            expect(Record).to receive(:where).with('1 = ANY("bibIds")').and_return([
+            expect(Record).to receive(:where).with('\'{1}\' && "bibIds"').and_return([
+                { 'test' => 1 }, { 'test' => 2 }, { 'test' => 3 }
+            ])
+            expect(HTTPMethods).to receive(:respond).with(200, [
+                { 'test' => 1 }, { 'test' => 2 }, { 'test' => 3 }
+            ]).and_return(200)
+
+            res = HTTPMethods.get_holdings(test_params)
+
+            expect(res).to eq(200)
+        end
+
+        it 'should return 200 if query with bib_ids is successful' do
+            test_params = { 'bib_ids' => '1,2,3' }
+            expect(HTTPMethods).to receive(:check_for_param_errors).with(test_params).and_return(nil)
+            expect(Record).to receive(:where).with('\'{1,2,3}\' && "bibIds"').and_return([
                 { 'test' => 1 }, { 'test' => 2 }, { 'test' => 3 }
             ])
             expect(HTTPMethods).to receive(:respond).with(200, [
@@ -129,6 +144,10 @@ describe HTTPMethods do
             expect(HTTPMethods).to receive(:respond).with(400, 'bib_id must be a single numerical value').and_return(400)
             expect(HTTPMethods.check_for_param_errors({ 'bib_id' => '1,2' })).to eq(400)
         end
+
+        it 'should return 400 error if bib_ids contains invalid characters' do
+            expect(HTTPMethods).to receive(:respond).with(400, 'bib_ids must contain comma-delimited numerical values').and_return(400)
+            expect(HTTPMethods.check_for_param_errors({ 'bib_id' => '1,2,abc' })).to eq(400)
     end
 
     describe :post_holding do
