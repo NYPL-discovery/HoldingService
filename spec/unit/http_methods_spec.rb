@@ -148,6 +148,7 @@ describe HTTPMethods do
         it 'should return 400 error if bib_ids contains invalid characters' do
             expect(HTTPMethods).to receive(:respond).with(400, 'bib_ids must contain comma-delimited numerical values').and_return(400)
             expect(HTTPMethods.check_for_param_errors({ 'bib_id' => '1,2,abc' })).to eq(400)
+        end
     end
 
     describe :post_holding do
