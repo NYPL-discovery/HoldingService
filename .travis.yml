@@ -30,8 +30,8 @@ deploy:
   environment:
     variables:
       DATABASE: holdings
-      DB_HOST: hold-requests-qa.cvy7z512hcjg.us-east-1.rds.amazonaws.com
-      DB_PASSWORD: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAG0wawYJKoZIhvcNAQcGoF4wXAIBADBXBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDCj1YNcdPDKcMz07hAIBEIAqsbZ0ryAqgiX49AWWCFoxIIGJeqflZQ/x+B13BP5E1kpSHisFyRN+cF4n
+      DB_HOST: holdings-qa.cvy7z512hcjg.us-east-1.rds.amazonaws.com
+      DB_PASSWORD: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAG8wbQYJKoZIhvcNAQcGoGAwXgIBADBZBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDNKgGHydxLJTdRqs8gIBEIAsumpCo4xJBMl3taUTj5euFJxSu77nUWvcmlIw1wHk6FR5aAHV7KmaVDD/5vs=
       DB_USERNAME: holdings_user
       LOG_LEVEL: info
       PLATFORM_API_BASE_URL: https://qa-platform.nypl.org/api/v0.1/
